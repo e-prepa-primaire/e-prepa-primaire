@@ -4,72 +4,79 @@
 <style>
 *{box-sizing:border-box}body{font-family:Arial;margin:0;background:#f2f6ff;color:#222}
 header{background:#1a56db;color:#fff;padding:18px;text-align:center}h1{margin:0;font-size:22px}
-.wrap{padding:12px;max-width:1000px;margin:auto}
+.wrap{padding:12px;max-width:1100px;margin:auto}
 .btn{border:0;padding:12px 14px;border-radius:10px;font-weight:bold;cursor:pointer;margin:4px}
 .cls{background:#fff;border:2px solid #1a56db;color:#1a56db}.cls.active{background:#1a56db;color:#fff}
 .rub{background:#ff8c00;color:#fff;width:100%;text-align:left;font-size:16px}
 input,textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-family:Arial}
 table{border-collapse:collapse;background:#fff;margin-top:10px;min-width:600px}
-td,th{border:1px solid #999;padding:5px;text-align:left;font-size:13px;vertical-align:top}th{background:#eef2ff}
+td,th{border:1px solid #000;padding:5px;text-align:center;font-size:12px;vertical-align:middle}th{background:#eef2ff}
+.champ{background:#d9e2f3;font-weight:bold;font-size:11px}.disc{background:#fff2cc;font-weight:bold}.sub{background:#e2efda}
 .scroll{overflow-x:auto;background:#fff;border:1px solid #ddd}
 .top{display:flex;gap:8px;flex-wrap:wrap}.save{background:#16a34a;color:#fff}.print{background:#222;color:#fff}
 .note{background:#fff3cd;padding:10px;border-radius:8px;margin:10px 0}
-.mois{background:#dbeafe;font-weight:bold;min-width:90px}
-@media print{header,.no-print{display:none!important}.scroll{overflow:visible}table{font-size:10px}}
+.mois{background:#dbeafe;font-weight:bold;min-width:90px;text-align:left}
+@media print{header,.no-print{display:none!important}.scroll{overflow:visible}table{font-size:9px}}
 </style></head><body>
 <header><h1>e-Prepa Primaire</h1><p>CP1 CP2 CE1 CE2 CM1 CM2 - Modèle Burkina</p></header>
 <div class="wrap"><div class="top no-print" id="classes"></div><div id="rubriques" class="no-print"></div><div id="content"></div></div>
 <script>
 const classes=["CP1","CP2","CE1","CE2","CM1","CM2"];
 const mois=["Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai"];
+const L="LANGUE ET COMMUNICATION",M="MATHEMATIQUES SCIENCES ET TECHNOLOGIE",S="SCIENCES HUMAINES ET SOCIALES",E="EDUCATION PHYSIQUE ET SPORTIVE, ART, CULTURE ET PRODUCTION";
+// Chaque colonne : [champ, discipline, sous-discipline]
 const rep={
-CP1:["Expression orale","Lecture","Ecriture","Mathématiques","Exercices sensoriels","TICE","ECP","Education Physique et Sportive","Art et Culture","Activités Pratiques de Productions"],
-CP2:["Expression orale","Lecture","Ecriture","Mathématiques","Exercices sensoriels","TICE","ECP","Education Physique et Sportive","Art et Culture","Activités Pratiques de Productions"],
-CE1:["Expression orale","Expression écrite","Lecture","Anglais","Ecriture","Vocabulaire","Grammaire","Conjugaison","Orthographe","Arithmétique","Système Métrique","Géométrie","Exercices d'observation","TICE","ECP","Histoire","Géographie","Education Physique et Sportive","Art et Culture","Activités Pratiques de Productions"],
-CE2:["Expression orale 1","Expression orale 2","Expression écrite","Lecture","Anglais","Ecriture","Vocabulaire usuel","Grammaire","Conjugaison","Orthographe","Arithmétique","Système Métrique","Géométrie","Exercices d'observation","TICE","ECP","Histoire","Géographie","Animation Sportive","Art et Culture","Activités Pratiques de Productions"],
-CM1:["Expression orale 1","Expression orale 2","Expression écrite","Lecture","Anglais","Ecriture","Vocabulaire usuel","Vocabulaire théorique","Grammaire","Conjugaison","Orthographe","Arithmétique","Système Métrique","Géométrie","Exercices d'observation","TICE","ECP","Histoire","Géographie","Animation Sportive","Art et Culture","Activités Pratiques de Productions"],
-CM2:["Expression orale 1","Expression orale 2","Expression écrite","Lecture","Anglais","Ecriture","Vocabulaire usuel","Vocabulaire théorique","Grammaire","Conjugaison","Orthographe","Arithmétique","Système Métrique","Géométrie","Exercices d'observation","TICE","ECP","Histoire","Géographie","Animation Sportive","Art et Culture","Activités Pratiques de Productions"]
+CP1:[[L,"Expression orale","Expression orale"],[L,"Lecture","Lecture"],[L,"Ecriture","Ecriture"],[M,"Mathématiques","Mathématiques"],[M,"Exercices sensoriels","Exercices sensoriels"],[M,"TICE","TICE"],[S,"ECP","ECP"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
+CP2:[[L,"Expression orale","Expression orale"],[L,"Lecture","Lecture"],[L,"Ecriture","Ecriture"],[M,"Mathématiques","Mathématiques"],[M,"Exercices sensoriels","Exercices sensoriels"],[M,"TICE","TICE"],[S,"ECP","ECP"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
+CE1:[[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire","Vocabulaire"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
+CE2:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
+CM1:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Vocabulaire théorique","Vocabulaire théorique"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
+CM2:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Vocabulaire théorique","Vocabulaire théorique"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]]
 };
-const rubs=[
-{id:"repartition",t:"1. Répartition mensuelle"},
-{id:"emploi",t:"2. Emploi du temps"},
-{id:"cahier",t:"3. Cahier de préparation"},
-{id:"liste",t:"4. Liste alphabétique des élèves"},
-{id:"plan",t:"5. Plan d'amélioration individuel"}
-];
+const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"}];
 let curCls="CP1",curRub="repartition";
-function key(){return "eprepa2_"+curCls+"_"+curRub}
+function key(){return "eprepa3_"+curCls+"_"+curRub}
 function load(){try{return JSON.parse(localStorage.getItem(key()))||[]}catch(e){return[]}}
 function save(){let d=[];document.querySelectorAll("tbody tr").forEach(tr=>{let r=[];tr.querySelectorAll("input,textarea").forEach(i=>r.push(i.value));d.push(r)});localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
 function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
 function renderClasses(){document.getElementById("classes").innerHTML=classes.map(c=>`<button class="btn cls ${c==curCls?"active":""}" onclick="setCls('${c}')">${c}</button>`).join("")}
 function renderRubs(){document.getElementById("rubriques").innerHTML=`<h3>${curCls} - Choisis une rubrique :</h3>`+rubs.map(r=>`<button class="btn rub" onclick="setRub('${r.id}')">${r.t}</button>`).join("")}
 function setRub(id){curRub=id;renderContent()}
+function groupRow(idx,clsName,firstLabel){
+let cols=rep[curCls];let html=`<th>${firstLabel}</th>`;let i=0;
+while(i<cols.length){let j=i;while(j<cols.length&&cols[j][idx]==cols[i][idx])j++;let span=j-i;html+=`<th colspan="${span}" class="${clsName}">${cols[i][idx]}</th>`;i=j;}
+return `<tr>${html}</tr>`;
+}
 function renderContent(){
 let data=load();
 if(curRub=="repartition"){
 let cols=rep[curCls];
-let head=`<th>Disciplines / Mensualités</th>`+cols.map(c=>`<th>${c}</th>`).join("");
+let head=groupRow(0,"champ","CHAMPS DISCIPLINAIRES")+groupRow(1,"disc","Disciplines / Mensualités");
+// Ligne 3 : sous-disciplines, seulement si Mathématiques est fractionnée (CE1 et +)
+let isSplit=curCls!="CP1"&&curCls!="CP2";
+if(isSplit){head+=`<tr><th>Disciplines / Mensualités</th>`+cols.map(c=>`<th class="sub">${c[2]}</th>`).join("")+`</tr>`;}
 let rows="";
 mois.forEach((m,i)=>{
 let cells=`<td class="mois">${m}</td>`;
 cols.forEach((c,j)=>{
 let v=data[i]&&data[i][j]?data[i][j]:"";
-if(curCls!="CP1"&&curCls!="CP2"&&j==2)v="INITIATION A LA PRODUCTION ECRITE A PARTIR DES THEMES DE LA LECTURE ET DES STRUCTURES ETUDIEES EN EXPRESSION ORALE";
-if((curCls=="CE1"||curCls=="CE2"||curCls=="CM1"||curCls=="CM2")&&((curCls=="CE1"&&j==5)||(curCls!="CE1"&&j==6)))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
+// Textes fixes de ton fichier
+if(isSplit&&c[1]=="Expression écrite")v="INITIATION A LA PRODUCTION ECRITE A PARTIR DES THEMES DE LA LECTURE ET DES STRUCTURES ETUDIEES EN EXPRESSION ORALE";
+if(isSplit&&c[1]=="Vocabulaire usuel"&&curCls=="CE2")v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
+if(isSplit&&c[1]=="Vocabulaire"&&curCls=="CE1")v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
+if(isSplit&&c[1]=="Vocabulaire usuel"&&(curCls=="CM1"||curCls=="CM2"))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
 if(data[i]&&data[i][j])v=data[i][j];
 cells+=`<td><textarea rows="3">${v}</textarea></td>`;
 });
 rows+=`<tr>${cells}</tr>`});
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - Répartition mensuelle</b><br>Modèle officiel Burkina - Octobre à Mai. Glisse le tableau vers la droite pour voir toutes les disciplines. Appuie sur une case et tape.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - Répartition mensuelle</b><br>Modèle officiel - CHAMPS DISCIPLINAIRES en haut, Mathématiques fractionnée en 3 pour ${curCls}. Glisse vers la droite.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
 return;
 }
-// Autres rubriques simples en attendant ton modèle
 let cfg={emploi:{cols:["Jour / Heure","8h-9h","9h-10h","10h-11h","11h-12h"],rows:5,first:["Lundi","Mardi","Mercredi","Jeudi","Vendredi"]},cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom","Prénom"],rows:30},plan:{cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}}[curRub];
 let head=cfg.cols.map(c=>`<th>${c}</th>`).join("");let rows="";
 for(let i=0;i<cfg.rows;i++){let cells="";for(let j=0;j<cfg.cols.length;j++){let v=data[i]&&data[i][j]?data[i][j]:"";if(cfg.first&&j==0)v=cfg.first[i];if(curRub=="liste"&&j==0)v=i+1;cells+=`<td><input value="${v.replace(/"/g,'')}" ${curRub=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
 let titre=rubs.find(r=>r.id==curRub).t;
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b><br>En attente de ton modèle vierge pour cette rubrique. Tu peux déjà remplir.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b><br>En attente de ton modèle vierge.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 renderClasses();renderRubs();renderContent();
 </script></body></html>
