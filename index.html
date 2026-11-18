@@ -1,17 +1,50 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>e-Prepa Primaire</title>
-</head>
-<body>
-<h1>e-Prepa Primaire</h1>
-<p>Ta preparation sans cahier ni bic</p>
-<button>CP1</button>
-<button>CP2</button>
-<button>CE1</button>
-<button>CE2</button>
-<button>CM1</button>
-<button>CM2</button>
-</body>
-</html>
+<style>
+*{box-sizing:border-box}body{font-family:Arial;margin:0;background:#f2f6ff;color:#222}
+header{background:#1a56db;color:#fff;padding:18px;text-align:center}
+h1{margin:0;font-size:22px}header p{margin:6px 0 0}
+.wrap{padding:12px;max-width:800px;margin:auto}
+.btn{border:0;padding:12px 14px;border-radius:10px;font-weight:bold;cursor:pointer;margin:4px}
+.cls{background:#fff;border:2px solid #1a56db;color:#1a56db}.cls.active{background:#1a56db;color:#fff}
+.rub{background:#ff8c00;color:#fff;width:100%;text-align:left;font-size:16px}
+input{width:100%;padding:9px;border:1px solid #ccc;border-radius:6px}
+table{width:100%;border-collapse:collapse;background:#fff;margin-top:10px}
+td,th{border:1px solid #ccc;padding:4px;text-align:left;font-size:14px}th{background:#eef2ff}
+.top{display:flex;gap:8px;flex-wrap:wrap}.save{background:#16a34a;color:#fff}.print{background:#222;color:#fff}
+.note{background:#fff3cd;padding:10px;border-radius:8px;margin:10px 0}
+@media print{header,.wrap>.top,.top,.no-print{display:none!important}table{font-size:12px}}
+</style></head><body>
+<header><h1>e-Prepa Primaire</h1><p>Ta préparation sans cahier ni bic - CP1 CP2 CE1 CE2 CM1 CM2</p></header>
+<div class="wrap">
+<div class="top no-print" id="classes"></div>
+<div id="rubriques" class="no-print"></div>
+<div id="content"></div>
+</div>
+<script>
+const classes=["CP1","CP2","CE1","CE2","CM1","CM2"];
+const rubs=[
+{id:"repartition",t:"1. Répartition mensuelle",cols:["Mois","Thème / Leçons"],rows:10},
+{id:"emploi",t:"2. Emploi du temps",cols:["Jour / Heure","8h-9h","9h-10h","10h-11h","11h-12h"],rows:5,first:["Lundi","Mardi","Mercredi","Jeudi","Vendredi"]},
+{id:"cahier",t:"3. Cahier de préparation",cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},
+{id:"liste",t:"4. Liste alphabétique des élèves",cols:["N°","Nom","Prénom"],rows:30},
+{id:"plan",t:"5. Plan d'amélioration individuel",cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}
+];
+let curCls="CP1", curRub="repartition";
+function key(){return "eprepa_"+curCls+"_"+curRub;}
+function load(){try{return JSON.parse(localStorage.getItem(key()))||[]}catch(e){return[]}}
+function save(){let d=[];document.querySelectorAll("tbody tr").forEach(tr=>{let r=[];tr.querySelectorAll("input").forEach(i=>r.push(i.value));d.push(r)});localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
+function renderClasses(){document.getElementById("classes").innerHTML=classes.map(c=>`<button class="btn cls ${c==curCls?"active":""}" onclick="setCls('${c}')">${c}</button>`).join("")}
+function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
+function renderRubs(){document.getElementById("rubriques").innerHTML=`<h3>${curCls} - Choisis une rubrique :</h3>`+rubs.map(r=>`<button class="btn rub" onclick="setRub('${r.id}')">${r.t}</button>`).join("")}
+function setRub(id){curRub=id;renderContent()}
+function renderContent(){
+let r=rubs.find(x=>x.id==curRub);let data=load();
+let head=r.cols.map(c=>`<th>${c}</th>`).join("");
+let rows="";
+for(let i=0;i<r.rows;i++){let cells="";for(let j=0;j<r.cols.length;j++){let v=data[i]&&data[i][j]?data[i][j]:"";if(j==0&&r.first)v=r.first[i];if(r.id=="liste"&&j==0)v=i+1;cells+=`<td><input value="${v.replace(/"/g,'')}" ${r.id=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
+document.getElementById("content").innerHTML=`<div class="note">📝 <b>${curCls} - ${r.t}</b><br>Appuie sur une case vide et tape. Ça s'enregistre tout seul sur ton téléphone.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table><p class="no-print" style="text-align:center"><button class="btn cls" onclick="setCls('${curCls}')">← Retour aux rubriques</button></p>`;
+}
+renderClasses();renderRubs();renderContent();
+</script></body></html>
