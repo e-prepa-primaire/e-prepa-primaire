@@ -24,18 +24,17 @@ td,th{border:1px solid #000;padding:5px;text-align:center;font-size:12px;vertica
 const classes=["CP1","CP2","CE1","CE2","CM1","CM2"];
 const mois=["Octobre","Novembre","Décembre","Janvier","Février","Mars","Avril","Mai"];
 const L="LANGUE ET COMMUNICATION",M="MATHEMATIQUES SCIENCES ET TECHNOLOGIE",S="SCIENCES HUMAINES ET SOCIALES",E="EDUCATION PHYSIQUE ET SPORTIVE, ART, CULTURE ET PRODUCTION";
-// Chaque colonne : [champ, discipline, sous-discipline]
 const rep={
-CP1:[[L,"Expression orale","Expression orale"],[L,"Lecture","Lecture"],[L,"Ecriture","Ecriture"],[M,"Mathématiques","Mathématiques"],[M,"Exercices sensoriels","Exercices sensoriels"],[M,"TICE","TICE"],[S,"ECP","ECP"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
-CP2:[[L,"Expression orale","Expression orale"],[L,"Lecture","Lecture"],[L,"Ecriture","Ecriture"],[M,"Mathématiques","Mathématiques"],[M,"Exercices sensoriels","Exercices sensoriels"],[M,"TICE","TICE"],[S,"ECP","ECP"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
-CE1:[[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire","Vocabulaire"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Education Physique et Sportive","Education Physique et Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
-CE2:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
-CM1:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Vocabulaire théorique","Vocabulaire théorique"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]],
-CM2:[[L,"Expression orale","Expression orale"],[L,"Expression orale","Expression orale"],[L,"Expression écrite","Expression écrite"],[L,"Lecture","Lecture"],[L,"Anglais","Anglais"],[L,"Ecriture","Ecriture"],[L,"Vocabulaire usuel","Vocabulaire usuel"],[L,"Vocabulaire théorique","Vocabulaire théorique"],[L,"Grammaire","Grammaire"],[L,"Conjugaison","Conjugaison"],[L,"Orthographe","Orthographe"],[M,"Mathématiques","Arithmétique"],[M,"Mathématiques","Système Métrique"],[M,"Mathématiques","Géométrie"],[M,"Exercices d'observation","Exercices d'observation"],[M,"TICE","TICE"],[S,"ECP","ECP"],[S,"Histoire","Histoire"],[S,"Géographie","Géographie"],[E,"Animation Sportive","Animation Sportive"],[E,"Art et Culture","Art et Culture"],[E,"Activités Pratiques de Productions","Activités Pratiques de Productions"]]
+CP1:[[L,"Expression orale"],[L,"Lecture"],[L,"Ecriture"],[M,"Mathématiques"],[M,"Exercices sensoriels"],[M,"TICE"],[S,"ECP"],[E,"Education Physique et Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]],
+CP2:[[L,"Expression orale"],[L,"Lecture"],[L,"Ecriture"],[M,"Mathématiques"],[M,"Exercices sensoriels"],[M,"TICE"],[S,"ECP"],[E,"Education Physique et Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]],
+CE1:[[L,"Expression orale"],[L,"Expression écrite"],[L,"Lecture"],[L,"Anglais"],[L,"Ecriture"],[L,"Vocabulaire"],[L,"Grammaire"],[L,"Conjugaison"],[L,"Orthographe"],[M,"Arithmétique"],[M,"Système Métrique"],[M,"Géométrie"],[M,"Exercices d'observation"],[M,"TICE"],[S,"ECP"],[S,"Histoire"],[S,"Géographie"],[E,"Education Physique et Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]],
+CE2:[[L,"Expression orale"],[L,"Expression orale"],[L,"Expression écrite"],[L,"Lecture"],[L,"Anglais"],[L,"Ecriture"],[L,"Vocabulaire usuel"],[L,"Grammaire"],[L,"Conjugaison"],[L,"Orthographe"],[M,"Arithmétique"],[M,"Système Métrique"],[M,"Géométrie"],[M,"Exercices d'observation"],[M,"TICE"],[S,"ECP"],[S,"Histoire"],[S,"Géographie"],[E,"Animation Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]],
+CM1:[[L,"Expression orale"],[L,"Expression orale"],[L,"Expression écrite"],[L,"Lecture"],[L,"Anglais"],[L,"Ecriture"],[L,"Vocabulaire usuel"],[L,"Vocabulaire théorique"],[L,"Grammaire"],[L,"Conjugaison"],[L,"Orthographe"],[M,"Arithmétique"],[M,"Système Métrique"],[M,"Géométrie"],[M,"Exercices d'observation"],[M,"TICE"],[S,"ECP"],[S,"Histoire"],[S,"Géographie"],[E,"Animation Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]],
+CM2:[[L,"Expression orale"],[L,"Expression orale"],[L,"Expression écrite"],[L,"Lecture"],[L,"Anglais"],[L,"Ecriture"],[L,"Vocabulaire usuel"],[L,"Vocabulaire théorique"],[L,"Grammaire"],[L,"Conjugaison"],[L,"Orthographe"],[M,"Arithmétique"],[M,"Système Métrique"],[M,"Géométrie"],[M,"Exercices d'observation"],[M,"TICE"],[S,"ECP"],[S,"Histoire"],[S,"Géographie"],[E,"Animation Sportive"],[E,"Art et Culture"],[E,"Activités Pratiques de Productions"]]
 };
 const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"}];
 let curCls="CP1",curRub="repartition";
-function key(){return "eprepa3_"+curCls+"_"+curRub}
+function key(){return "eprepa4_"+curCls+"_"+curRub}
 function load(){try{return JSON.parse(localStorage.getItem(key()))||[]}catch(e){return[]}}
 function save(){let d=[];document.querySelectorAll("tbody tr").forEach(tr=>{let r=[];tr.querySelectorAll("input,textarea").forEach(i=>r.push(i.value));d.push(r)});localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
 function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
@@ -51,25 +50,21 @@ function renderContent(){
 let data=load();
 if(curRub=="repartition"){
 let cols=rep[curCls];
-let head=groupRow(0,"champ","CHAMPS DISCIPLINAIRES")+groupRow(1,"disc","Disciplines / Mensualités");
-// Ligne 3 : sous-disciplines, seulement si Mathématiques est fractionnée (CE1 et +)
 let isSplit=curCls!="CP1"&&curCls!="CP2";
-if(isSplit){head+=`<tr><th>Disciplines / Mensualités</th>`+cols.map(c=>`<th class="sub">${c[2]}</th>`).join("")+`</tr>`;}
+// CORRECTION : seulement 2 lignes d'en-tête, plus de doublon
+let head=groupRow(0,"champ","CHAMPS DISCIPLINAIRES")+`<tr><th>Disciplines / Mensualités</th>`+cols.map(c=>`<th class="disc">${c[1]}</th>`).join("")+`</tr>`;
 let rows="";
 mois.forEach((m,i)=>{
 let cells=`<td class="mois">${m}</td>`;
 cols.forEach((c,j)=>{
 let v=data[i]&&data[i][j]?data[i][j]:"";
-// Textes fixes de ton fichier
 if(isSplit&&c[1]=="Expression écrite")v="INITIATION A LA PRODUCTION ECRITE A PARTIR DES THEMES DE LA LECTURE ET DES STRUCTURES ETUDIEES EN EXPRESSION ORALE";
-if(isSplit&&c[1]=="Vocabulaire usuel"&&curCls=="CE2")v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
-if(isSplit&&c[1]=="Vocabulaire"&&curCls=="CE1")v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
-if(isSplit&&c[1]=="Vocabulaire usuel"&&(curCls=="CM1"||curCls=="CM2"))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
+if(isSplit&&(c[1]=="Vocabulaire"||c[1]=="Vocabulaire usuel"))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";
 if(data[i]&&data[i][j])v=data[i][j];
 cells+=`<td><textarea rows="3">${v}</textarea></td>`;
 });
 rows+=`<tr>${cells}</tr>`});
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - Répartition mensuelle</b><br>Modèle officiel - CHAMPS DISCIPLINAIRES en haut, Mathématiques fractionnée en 3 pour ${curCls}. Glisse vers la droite.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - Répartition mensuelle</b><br>2 lignes d'en-tête seulement : CHAMPS + DISCIPLINES. Mathématiques déjà fractionnée en Arithmétique / Système Métrique / Géométrie.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;
 return;
 }
 let cfg={emploi:{cols:["Jour / Heure","8h-9h","9h-10h","10h-11h","11h-12h"],rows:5,first:["Lundi","Mardi","Mercredi","Jeudi","Vendredi"]},cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom","Prénom"],rows:30},plan:{cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}}[curRub];
