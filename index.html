@@ -9,7 +9,7 @@ header{background:#1a56db;color:#fff;padding:18px;text-align:center}h1{margin:0;
 .cls{background:#fff;border:2px solid #1a56db;color:#1a56db}.cls.active{background:#1a56db;color:#fff}
 .rub{background:#ff8c00;color:#fff;width:100%;text-align:left;font-size:16px}
 input,textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;font-family:Arial}
-table{border-collapse:collapse;background:#fff;margin-top:10px;min-width:600px}
+table{border-collapse:collapse;background:#fff;margin-top:10px;width:100%}
 td,th{border:1px solid #000;padding:5px;text-align:center;font-size:12px;vertical-align:middle}th{background:#eef2ff}
 .champ{background:#d9e2f3;font-weight:bold;font-size:11px}.disc{background:#fff2cc;font-weight:bold}.sub{background:#e2efda}
 .scroll{overflow-x:auto;background:#fff;border:1px solid #ddd}
@@ -17,7 +17,13 @@ td,th{border:1px solid #000;padding:5px;text-align:center;font-size:12px;vertica
 .note{background:#fff3cd;padding:10px;border-radius:8px;margin:10px 0}
 .mois{background:#dbeafe;font-weight:bold;min-width:90px;text-align:left}
 .recap th{background:#d9e2f3}
-@media print{header,.no-print{display:none!important}.scroll{overflow:visible}table{font-size:9px}}
+@media print{
+  @page{ size: A4 landscape; margin: 8mm; }
+  header,.no-print{display:none!important}
+  body{background:#fff}
+  .wrap{padding:0;max-width:none}
+  .scroll{overflow:visible!important}
+  table{min-width:0!important;width:100%!important;font-si
 </style></head><body>
 <header><h1>e-Prepa Primaire</h1><p>CP1 CP2 CE1 CE2 CM1 CM2 - Modèle Burkina</p></header>
 <div class="wrap"><div class="top no-print" id="classes"></div><div id="rubriques" class="no-print"></div><div id="content"></div></div>
