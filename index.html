@@ -31,6 +31,7 @@ input,textarea{border:0!important;padding:0!important;margin:0!important;font-si
 h3{font-size:9px!important;margin:3px 0 1px}
 p{font-size:7px!important;margin:1px 0}
 .note{padding:2px!important;margin:2px 0!important;font-size:8px!important}
+.recap-page{break-before:page!important;page-break-before:always!important}
 }
 </style></head><body>
 <header><h1>e-Prepa Primaire</h1><p>CP1 CP2 CE1 CE2 CM1 CM2 - Modèle Burkina</p></header>
@@ -77,7 +78,7 @@ let rows=e.main.map(r=>{let cells=r.map((c,j)=>{let v=data[idx]!==undefined?data
 let recapHead=`<tr>${e.recapHead.map(h=>`<th>${h}</th>`).join("")}</tr>`;
 let recapRows=e.recap.map(r=>{let cells=r.map(c=>{let v=data[idx]!==undefined?data[idx]:c;idx++;return `<td><input value="${v.replace(/"/g,'')}"></td>`}).join("");return `<tr>${cells}</tr>`;}).join("");
 let num=curCls=="CP1"?"1re":curCls=="CP2"?"2e":curCls;
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${e.titre}</b><br>ANNÉE SCOLAIRE : <input style="width:120px;display:inline-block" value=""></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll emploi"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div><h3>Tableau récapitulatif ${num}</h3><div class="scroll"><table class="recap"><thead>${recapHead}</thead><tbody>${recapRows}</tbody></table></div><p style="font-size:12px">Le/la Titulaire de la classe &nbsp;&nbsp; Le/la Directeur/trice de l’école &nbsp;&nbsp; Visa du Chef de Circonscription</p>`;return;}
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${e.titre}</b><br>ANNÉE SCOLAIRE : <input style="width:120px;display:inline-block" value=""></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll emploi"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div><div class="recap-page"><h3>Tableau récapitulatif ${num}</h3><div class="scroll"><table class="recap"><thead>${recapHead}</thead><tbody>${recapRows}</tbody></table></div><p style="font-size:12px">Le/la Titulaire de la classe &nbsp;&nbsp; Le/la Directeur/trice de l’école &nbsp;&nbsp; Visa du Chef de Circonscription</p></div>`;return;}
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - 2. Emploi du temps</b><br>En attente de ton fichier pour ${curCls}.</div>`;return;}
 let cfg={cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom","Prénom"],rows:30},plan:{cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}}[curRub];
 let head=cfg.cols.map(c=>`<th>${c}</th>`).join("");let rows="";for(let i=0;i<cfg.rows;i++){let cells="";for(let j=0;j<cfg.cols.length;j++){let v=data[i*cfg.cols.length+j]||"";if(curRub=="liste"&&j==0)v=i+1;cells+=`<td><input value="${v}" ${curRub=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
