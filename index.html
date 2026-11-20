@@ -56,33 +56,71 @@ CE2:{titre:"EMPLOI DE TEMPS DU CE2 DES ECOLES PRIMAIRES CLASSIQUES",recapHead:["
 };
 const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"}];
 let curCls="CP1",curRub="repartition";
-function key(){return "eprepa4_"+curCls+"_"+curRub}
-function load(){try{return JSON.parse(localStorage.getItem(key()))||[]}catch(e){return[]}}
-function save(){let d=[];document.querySelectorAll("#content input, #content textarea").forEach(i=>d.push(i.value));localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
+function key(){return "eprepa5_"+curCls+"_"+curRub}
+function load(){try{let v=JSON.parse(localStorage.getItem(key()));if(v&&!Array.isArray(v))return v;return {}}catch(e){return {}}}
+function save(){let d={};document.querySelectorAll("#content input[data-k], #content textarea[data-k]").forEach(i=>d[i.dataset.k]=i.value);localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
 function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
 function renderClasses(){document.getElementById("classes").innerHTML=classes.map(c=>`<button class="btn cls ${c==curCls?"active":""}" onclick="setCls('${c}')">${c}</button>`).join("")}
 function renderRubs(){document.getElementById("rubriques").innerHTML=`<h3>${curCls} - Choisis une rubrique :</h3>`+rubs.map(r=>`<button class="btn rub" onclick="setRub('${r.id}')">${r.t}</button>`).join("")}
 function setRub(id){curRub=id;renderContent()}
 function groupRow(idx,clsName,firstLabel){let cols=rep[curCls];let html=`<th>${firstLabel}</th>`;let i=0;while(i<cols.length){let j=i;while(j<cols.length&&cols[j][idx]==cols[i][idx])j++;let span=j-i;html+=`<th colspan="${span}" class="${clsName}">${cols[i][idx]}</th>`;i=j;}return `<tr>${html}</tr>`;}
+function esc(s){return String(s).replace(/"/g,'')}
 function renderContent(){
 let data=load();
 if(curRub=="repartition"){
 let cols=rep[curCls];let isSplit=curCls!="CP1"&&curCls!="CP2";
 let head=groupRow(0,"champ","CHAMPS DISCIPLINAIRES")+`<tr><th>Disciplines / Mensualités</th>`+cols.map(c=>`<th class="disc">${c[1]}</th>`).join("")+`</tr>`;
-let rows="";mois.forEach((m,i)=>{let cells=`<td class="mois">${m}</td>`;cols.forEach((c,j)=>{let v=data[i]&&data[i][j]?data[i][j]:"";if(isSplit&&c[1]=="Expression écrite")v="INITIATION A LA PRODUCTION ECRITE A PARTIR DES THEMES DE LA LECTURE ET DES STRUCTURES ETUDIEES EN EXPRESSION ORALE";if(isSplit&&(c[1]=="Vocabulaire"||c[1]=="Vocabulaire usuel"))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";if(data[i]&&data[i][j])v=data[i][j];cells+=`<td><textarea rows="3">${v}</textarea></td>`;});rows+=`<tr>${cells}</tr>`});
+let rows="";mois.forEach((m,i)=>{let cells=`<td class="mois">${m}</td>`;cols.forEach((c,j)=>{let k="r"+i+"c"+j;let v=data[k]!==undefined?data[k]:"";if(!data[k]){if(isSplit&&c[1]=="Expression écrite")v="INITIATION A LA PRODUCTION ECRITE A PARTIR DES THEMES DE LA LECTURE ET DES STRUCTURES ETUDIEES EN EXPRESSION ORALE";if(isSplit&&(c[1]=="Vocabulaire"||c[1]=="Vocabulaire usuel"))v="EN RAPPORT AVEC LES THÈMES DE LECTURE";}cells+=`<td><textarea rows="3" data-k="${k}">${v}</textarea></td>`;});rows+=`<tr>${cells}</tr>`});
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - Répartition mensuelle</b></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div>`;return;}
 if(curRub=="emploi"){
 if(emplois[curCls]){
-let e=emplois[curCls];let idx=0;
+let e=emplois[curCls];
 let head=`<tr><th>Horaires</th><th>DURÉE</th><th>LUNDI</th><th>MARDI</th><th>MERCREDI</th><th>JEUDI</th><th>VENDREDI</th></tr>`;
-let rows=e.main.map(r=>{let cells=r.map((c,j)=>{let v=data[idx]!==undefined?data[idx]:c;idx++;if(j>=2) return `<td><textarea rows="2">${v.replace(/"/g,'')}</textarea></td>`;return `<td><input value="${v.replace(/"/g,'')}"></td>`;}).join("");return `<tr>${cells}</tr>`;}).join("");
+let skip={};let rows="";
+e.main.forEach((r,ri)=>{
+let isFull=r.slice(2).every(c=>c=="RECREATION"||c=="INTER-CLASSE")&&r[2]==r[3];
+if(isFull){
+let k="m"+ri+"c2";let v=data[k]!==undefined?data[k]:r[2];
+rows+=`<tr><td><input data-k="m${ri}c0" value="${esc(data["m"+ri+"c0"]!==undefined?data["m"+ri+"c0"]:r[0])}"></td><td><input data-k="m${ri}c1" value="${esc(data["m"+ri+"c1"]!==undefined?data["m"+ri+"c1"]:r[1])}"></td><td colspan="5"><textarea rows="1" data-k="${k}">${v}</textarea></td></tr>`;return;
+}
+let cells=`<td><input data-k="m${ri}c0" value="${esc(data["m"+ri+"c0"]!==undefined?data["m"+ri+"c0"]:r[0])}"></td><td><input data-k="m${ri}c1" value="${esc(data["m"+ri+"c1"]!==undefined?data["m"+ri+"c1"]:r[1])}"></td>`;
+for(let cj=2;cj<7;cj++){
+let kk="m"+ri+"c"+cj;
+if(skip[kk]) continue;
+let val=r[cj];
+if(val===""){cells+=`<td><textarea rows="2" data-k="${kk}"></textarea></td>`;continue;}
+let span=1;
+for(let nr=ri+1;nr<e.main.length;nr++){if(e.main[nr][cj]===val && e.main[nr].slice(2).every(c=>c!="RECREATION"&&c!="INTER-CLASSE")) span++; else break;}
+for(let s=1;s<span;s++) skip["m"+(ri+s)+"c"+cj]=true;
+let v=data[kk]!==undefined?data[kk]:val;
+cells+=`<td rowspan="${span}"><textarea rows="2" data-k="${kk}">${v}</textarea></td>`;
+}
+rows+=`<tr>${cells}</tr>`;
+});
 let recapHead=`<tr>${e.recapHead.map(h=>`<th>${h}</th>`).join("")}</tr>`;
-let recapRows=e.recap.map(r=>{let cells=r.map(c=>{let v=data[idx]!==undefined?data[idx]:c;idx++;return `<td><input value="${v.replace(/"/g,'')}"></td>`}).join("");return `<tr>${cells}</tr>`;}).join("");
+let skipR={};let recapRows="";
+e.recap.forEach((r,ri)=>{
+let cells="";
+for(let cj=0;cj<r.length;cj++){
+let kk="p"+ri+"c"+cj;
+if(skipR[kk]) continue;
+if(cj==0 && r[0]!==""){
+let span=1;
+for(let nr=ri+1;nr<e.recap.length;nr++){if(e.recap[nr][0]===r[0]) span++; else break;}
+for(let s=1;s<span;s++) skipR["p"+(ri+s)+"c0"]=true;
+let v=data[kk]!==undefined?data[kk]:r[cj];
+cells+=`<td rowspan="${span}"><input data-k="${kk}" value="${esc(v)}"></td>`;continue;
+}
+let v=data[kk]!==undefined?data[kk]:r[cj];
+cells+=`<td><input data-k="${kk}" value="${esc(v)}"></td>`;
+}
+recapRows+=`<tr>${cells}</tr>`;
+});
 let num=curCls=="CP1"?"1re":curCls=="CP2"?"2e":curCls;
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${e.titre}</b><br>ANNÉE SCOLAIRE : <input style="width:120px;display:inline-block" value=""></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll emploi"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div><div class="recap-page"><h3>Tableau récapitulatif ${num}</h3><div class="scroll"><table class="recap"><thead>${recapHead}</thead><tbody>${recapRows}</tbody></table></div><p style="font-size:12px">Le/la Titulaire de la classe &nbsp;&nbsp; Le/la Directeur/trice de l’école &nbsp;&nbsp; Visa du Chef de Circonscription</p><p style="font-size:10px">N.B : Les écoles qui disposent de matériel informatique pourraient consacrer le temps réservé aux Travaux Pratiques d’Observation (30mn le vendredi soir) pour les TIC</p></div>`;return;}
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - 2. Emploi du temps</b><br>En attente de ton fichier pour ${curCls}.</div>`;return;}
 let cfg={cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom","Prénom"],rows:30},plan:{cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}}[curRub];
-let head=cfg.cols.map(c=>`<th>${c}</th>`).join("");let rows="";for(let i=0;i<cfg.rows;i++){let cells="";for(let j=0;j<cfg.cols.length;j++){let v=data[i*cfg.cols.length+j]||"";if(curRub=="liste"&&j==0)v=i+1;cells+=`<td><input value="${v}" ${curRub=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
+let head=cfg.cols.map(c=>`<th>${c}</th>`).join("");let rows="";for(let i=0;i<cfg.rows;i++){let cells="";for(let j=0;j<cfg.cols.length;j++){let k="x"+i+"c"+j;let v=data[k]||"";if(curRub=="liste"&&j==0)v=i+1;cells+=`<td><input data-k="${k}" value="${esc(v)}" ${curRub=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
 let titre=rubs.find(r=>r.id==curRub).t;
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b><br>En attente de ton modèle vierge.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
