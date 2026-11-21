@@ -171,7 +171,7 @@ function refreshReleve(){
   main.innerHTML="<div id='pageReleve'>"+htmlReleve(c,t)+"</div>";
   updateRangsReleve(c,t);
 }
-const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"},{id:"releve",t:"6. Cahier de relevés de notes"},{id:"proposition",t:"7. Proposition de fin d'année"}
+const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"},{id:"releve",t:"6. Cahier de relevés de notes"},{id:"proposition",t:"7. Proposition de fin d'année"}];
 let curCls="CP1",curRub="repartition";
 function key(){return "eprepa5_"+curCls+"_"+curRub}
 function load(){try{let v=JSON.parse(localStorage.getItem(key()));if(v&&!Array.isArray(v))return v;return {}}catch(e){return {}}}
