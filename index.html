@@ -184,6 +184,17 @@ function groupRow(idx,clsName,firstLabel){let cols=rep[curCls];let html=`<th>${f
 function esc(s){return String(s).replace(/"/g,'')}
 function renderContent(){
 let data=load();
+if(curRub==="releve"){
+  window._classeReleve=curCls||"CP1";
+  window._triReleve=window._triReleve||1;
+  document.getElementById("content").innerHTML="<div id='pageReleve'>"+htmlReleve(window._classeReleve,window._triReleve)+"</div>";
+  updateRangsReleve(window._classeReleve,window._triReleve);
+  return;
+}
+if(curRub==="proposition"){
+  document.getElementById("content").innerHTML=htmlProposition(curCls||"CP1");
+  return;
+}
 if(curRub=="repartition"){
 let cols=rep[curCls];let isSplit=curCls!="CP1"&&curCls!="CP2";
 let head=groupRow(0,"champ","CHAMPS DISCIPLINAIRES")+`<tr><th>Disciplines / Mensualités</th>`+cols.map(c=>`<th class="disc">${c[1]}</th>`).join("")+`</tr>`;
