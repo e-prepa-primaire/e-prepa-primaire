@@ -95,6 +95,82 @@ function appreciation(m){
   if(m>=3) return "Passable";
   return "Insuffisant";
 }
+function releveKey(classe,tri){return "releve_"+classe+"_T"+tri;}
+function getReleve(classe,tri){
+  try{return JSON.parse(localStorage.getItem(releveKey(classe,tri))||"{}");}catch(e){return {};}
+}
+function saveReleve(classe,tri,idx,mat,val){
+  const d=getReleve(classe,tri);
+  if(!d[idx]) d[idx]={};
+  d[idx][mat]=val;
+  localStorage.setItem(releveKey(classe,tri),JSON.stringify(d));
+  const mats=MATIERES_RELEVE[classe]||[];
+  let tot=0,max=0;
+  mats.forEach((m,i)=>{const v=parseFloat(d[idx][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
+  const moy=max?(tot/max*10).toFixed(2):"";
+  const el=document.getElementById("moy_"+idx);
+  if(el) el.textContent=moy;
+  const ap=document.getElementById("app_"+idx);
+  if(ap) ap.textContent=appreciation(moy);
+  updateRangsReleve(classe,tri);
+}
+function updateRangsReleve(classe,tri){
+  const eleves=getEleves(classe);
+  const d=getReleve(classe,tri);
+  const mats=MATIERES_RELEVE[classe]||[];
+  const arr=eleves.map((nom,idx)=>{
+    let tot=0,max=0;
+    mats.forEach((m,i)=>{const v=parseFloat(d[idx]&&d[idx][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
+    return {idx,moy:max?(tot/max*10):-1};
+  });
+  arr.sort((a,b)=>b.moy-a.moy);
+  let rang=1;
+  arr.forEach((o,i)=>{
+    if(i>0 && o.moy<arr[i-1].moy) rang=i+1;
+    const el=document.getElementById("rang_"+o.idx);
+    if(el) el.textContent=o.moy>=0?rang:"";
+  });
+}
+function htmlReleve(classe,tri){
+  const eleves=getEleves(classe);
+  const mats=MATIERES_RELEVE[classe]||[];
+  const d=getReleve(classe,tri);
+  if(!eleves.length) return "<p style='padding:16px'>Aucun élève trouvé.<br>Va d'abord remplir la <b>Liste alphabétique</b> pour la classe "+classe+".</p>";
+  let h="<div style='padding:10px;overflow:auto'><div style='display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px'>";
+  ["CP1","CP2","CE1","CE2","CM1","CM2"].forEach(c=>{
+    h+="<button onclick=\"window._classeReleve='"+c+"';window._triReleve="+tri+";refreshReleve()\" style='padding:8px 12px;border-radius:20px;border:1px solid #ddd;background:"+(c===classe?"#0b6b3a;color:white":"white")+";font-weight:700'>"+c+"</button>";
+  });
+  h+="</div><div style='display:flex;gap:8px;margin-bottom:10px'>";
+  [1,2,3].forEach(t=>{
+    h+="<button onclick=\"window._triReleve="+t+";refreshReleve()\" style='padding:8px 14px;border-radius:20px;border:1px solid #ddd;background:"+(t===tri?"#0b6b3a;color:white":"white")+";font-weight:700'>Trimestre "+t+"</button>";
+  });
+  h+="<button onclick='window.print()' style='padding:8px 14px;border-radius:20px;background:#111;color:white;font-weight:700'>🖨️ Imprimer / Bulletin</button></div>";
+  h+="<table border='1' cellpadding='5' cellspacing='0' style='border-collapse:collapse;font-size:13px;min-width:900px'><tr><th>N°</th><th>Nom et Prénom</th>";
+  mats.forEach(m=>{h+="<th>"+m[0]+"<br><small>/"+m[1]+"</small></th>";});
+  h+="<th>Moyenne /10</th><th>Rang</th><th>Appréciation</th></tr>";
+  eleves.forEach((nom,idx)=>{
+    h+="<tr><td>"+(idx+1)+"</td><td style='white-space:nowrap;font-weight:600'>"+nom+"</td>";
+    mats.forEach((m,i)=>{
+      const v=(d[idx]&&d[idx][i])||"";
+      h+="<td><input type='number' min='0' max='"+m[1]+"' step='0.25' value='"+v+"' onchange=\"saveReleve('"+classe+"',"+tri+","+idx+","+i+",this.value)\" style='width:55px;padding:6px;text-align:center'></td>";
+    });
+    let tot=0,max=0;
+    mats.forEach((m,i)=>{const v=parseFloat(d[idx]&&d[idx][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
+    const moy=max?(tot/max*10).toFixed(2):"";
+    h+="<td id='moy_"+idx+"' style='font-weight:800;text-align:center'>"+moy+"</td><td id='rang_"+idx+"' style='text-align:center'></td><td id='app_"+idx+"'>"+appreciation(moy)+"</td></tr>";
+  });
+  h+="</table><p style='font-size:12px;color:#666'>Les notes sont enregistrées automatiquement. La moyenne est sur 10 même pour les matières sur 20.</p></div>";
+  return h;
+}
+function refreshReleve(){
+  const c=window._classeReleve||"CP1";
+  const t=window._triReleve||1;
+  const box=document.getElementById("pageReleve")||document.getElementById("contenu")||document.body;
+  // On essaie d'afficher dans la zone principale de l'app
+  const main=document.querySelector("[id*='contenu'],[id*='page'],[id*='main']")||box;
+  main.innerHTML="<div id='pageReleve'>"+htmlReleve(c,t)+"</div>";
+  updateRangsReleve(c,t);
+}
 const rubs=[{id:"repartition",t:"1. Répartition mensuelle"},{id:"emploi",t:"2. Emploi du temps"},{id:"cahier",t:"3. Cahier de préparation"},{id:"liste",t:"4. Liste alphabétique des élèves"},{id:"plan",t:"5. Plan d'amélioration individuel"}];,{id:"releve",t:"6. Cahier de relevés de notes"},{id:"proposition",t:"7. Proposition de fin d'année"}
 let curCls="CP1",curRub="repartition";
 function key(){return "eprepa5_"+curCls+"_"+curRub}
