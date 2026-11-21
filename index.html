@@ -254,3 +254,31 @@ document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - $
 }
 renderClasses();renderRubs();renderContent();
 </script></body></html>
+<script>
+function htmlProposition(classe){
+  const eleves=getEleves(classe);
+  if(!eleves.length) return "<p style='padding:16px'>Aucun élève. Remplis d'abord la Liste alphabétique.</p>";
+  let rows=eleves.map((nom,idx)=>{
+    let ms=[];
+    [1,2,3].forEach(t=>{
+      const d=getReleve(classe,t);
+      const mats=MATIERES_RELEVE[classe]||[];
+      let tot=0,max=0;
+      mats.forEach((m,i)=>{const v=parseFloat(d[idx]&&d[idx][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
+      ms.push(max?(tot/max*10):null);
+    });
+    const valides=ms.filter(v=>v!==null);
+    const moyAn=valides.length?(valides.reduce((a,b)=>a+b,0)/valides.length).toFixed(2):"";
+    return {nom,ms,moyAn};
+  });
+  rows.sort((a,b)=>parseFloat(b.moyAn||-1)-parseFloat(a.moyAn||-1));
+  let h="<div style='padding:10px;overflow:auto'><h3>Proposition de fin d'année - "+classe+"</h3><table border='1' cellpadding='6' cellspacing='0' style='border-collapse:collapse;min-width:700px'><tr><th>Rang</th><th>Nom et Prénom</th><th>T1 /10</th><th>T2 /10</th><th>T3 /10</th><th>Moyenne annuelle</th><th>Décision</th></tr>";
+  rows.forEach((r,i)=>{
+    const moy=parseFloat(r.moyAn);
+    const dec=r.moyAn===""?"-":(moy>=5?"ADMIS":"REDOUBLANT");
+    h+="<tr><td>"+(i+1)+"</td><td style='font-weight:600'>"+r.nom+"</td><td>"+(r.ms[0]!==null?r.ms[0].toFixed(2):"-")+"</td><td>"+(r.ms[1]!==null?r.ms[1].toFixed(2):"-")+"</td><td>"+(r.ms[2]!==null?r.ms[2].toFixed(2):"-")+"</td><td style='font-weight:800'>"+r.moyAn+"</td><td style='font-weight:700;color:"+(dec==="ADMIS"?"green":"red")+"'>"+dec+"</td></tr>";
+  });
+  h+="</table><p style='font-size:12px'>Admis si moyenne annuelle >= 5 / 10. Sinon redoublant.</p><button onclick='window.print()' style='padding:10px 16px;background:#111;color:white;border-radius:20px;font-weight:700'>🖨️ Imprimer</button></div>";
+  return h;
+}
+</script>
