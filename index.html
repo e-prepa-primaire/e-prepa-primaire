@@ -167,7 +167,7 @@ let curCls="CP1",curRub="repartition";
 function key(){return "eprepa5_"+curCls+"_"+curRub}
 function load(){try{let v=JSON.parse(localStorage.getItem(key()));if(v&&!Array.isArray(v))return v;return {}}catch(e){return {}}}
 function addLigne(){let k="eprepa5_"+curCls+"_"+curRub+"_extra";let n=parseInt(localStorage.getItem(k)||"0")+1;localStorage.setItem(k,n);renderContent();}
-function save(){let d={};document.querySelectorAll("#content input[data-k], #content textarea[data-k]").forEach(i=>d[i.dataset.k]=i.value);localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
+function save(){let d={};document.querySelectorAll("#content input[data-k], #content textarea[data-k], #content select[data-k]").forEach(i=>{if(i.type=="checkbox")d[i.dataset.k]=i.checked?"1":"";else d[i.dataset.k]=i.value});localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
 function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
 function renderClasses(){document.getElementById("classes").innerHTML=classes.map(c=>`<button class="btn cls ${c==curCls?"active":""}" onclick="setCls('${c}')">${c}</button>`).join("")}
 function renderRubs(){document.getElementById("rubriques").innerHTML=`<h3>${curCls} - Choisis une rubrique :</h3>`+rubs.map(r=>`<button class="btn rub" onclick="setRub('${r.id}')">${r.t}</button>`).join("")}
