@@ -242,7 +242,7 @@ document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - 2
 let extra=parseInt(localStorage.getItem("eprepa5_"+curCls+"_"+curRub+"_extra")||"0");let cfg={cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom et prénom","Sexe","Date de naissance","Lieu de naissance","Classe redoublée","Profession des parents","Religion"],rows:60+extra},plan:{cols:["Élève","Difficulté","Ce que je vais faire pour l'aider","Date"],rows:10}}[curRub];
 let head=cfg.cols.map(c=>`<th>${c}</th>`).join("");let rows="";for(let i=0;i<cfg.rows;i++){let cells="";for(let j=0;j<cfg.cols.length;j++){let k="x"+i+"c"+j;let v=data[k]||"";if(curRub=="liste"&&j==0)v=i+1;cells+=`<td><input data-k="${k}" value="${esc(v)}" ${curRub=="liste"&&j==0?"readonly":""}></td>`}rows+=`<tr>${cells}</tr>`}
 let titre=rubs.find(r=>r.id==curRub).t;
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b><br>En attente de ton modèle vierge.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b><br>En attente de ton modèle vierge.</div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn" onclick="addLigne()">+ Ajouter une ligne</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
 renderClasses();renderRubs();renderContent();
 </script></body></html>
