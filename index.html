@@ -141,7 +141,7 @@ function htmlReleve(classe,tri){
   h+="<button onclick='window.print()' style='padding:8px 14px;border-radius:20px;background:#111;color:white;font-weight:700'>🖨️ Imprimer / Bulletin</button></div>";
   h+="<table border='1' cellpadding='5' cellspacing='0' style='border-collapse:collapse;font-size:13px;min-width:900px'><tr><th>N°</th><th>Nom et Prénom</th>";
   mats.forEach(m=>{h+="<th>"+m[0]+"<br><small>/"+m[1]+"</small></th>";});
-  h+="<th>Moyenne /10</th><th>Rang</th><th>Appréciation</th></tr>";
+  h+="<th>Total</th><th>Moyenne /10</th><th>Rang</th><th>Appréciation</th></tr>";
   eleves.forEach((nom,idx)=>{
     h+="<tr><td>"+(idx+1)+"</td><td style='white-space:nowrap;font-weight:600'>"+nom+"</td>";
     mats.forEach((m,i)=>{
