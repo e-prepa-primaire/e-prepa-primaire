@@ -69,7 +69,7 @@ CM2:[["Rédaction",10],["Dictée",10],["Étude de texte",20],["Présentation",10
 };
 
 function getEleves(classe){
-try{let d=JSON.parse(localStorage.getItem("eprepa5_"+classe+"_liste")||"{}");let r=[];for(let i=0;i<30;i++){let n=(d["x"+i+"c1"]||"").trim().toUpperCase();let p=(d["x"+i+"c2"]||"").trim();if(n||p)r.push(n+(p?" "+p:""));}r.sort((a,b)=>a.localeCompare(b));if(r.length)return r;}catch(e){}return [];}
+try{let d=JSON.parse(localStorage.getItem("eprepa5_"+classe+"_liste")||"{}");let r=[];for(let i=0;i<30;i++){let n=(d["x"+i+"c1"]||"").trim().toUpperCase();if(n)r.push(n);}r.sort((a,b)=>a.localeCompare(b));if(r.length)return r;}catch(e){}return [];}
 function calcMoyenne(notes,classe){
   const mats=MATIERES_RELEVE[classe]||[];
   let tot=0,max=0,nb=0;
