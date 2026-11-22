@@ -30,6 +30,9 @@ input,textarea{border:0!important;padding:0!important;margin:0!important;font-si
 .emploi td textarea{height:20px!important;min-height:20px!important}
 h3{font-size:9px!important;margin:3px 0 1px}
 p{font-size:7px!important;margin:1px 0}
+#content td:nth-child(6) label:has(input[type="checkbox"]:not(:checked)){display:none!important}
+#content td:nth-child(6) input[type="checkbox"]{display:none!important}
+#content td:nth-child(6) label:has(input:checked)::before{content:"☑ "}
 .note{padding:2px!important;margin:2px 0!important;font-size:8px!important}
 .recap-page{break-before:page!important;page-break-before:always!important}
 }
