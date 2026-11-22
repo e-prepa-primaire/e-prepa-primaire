@@ -151,7 +151,7 @@ function htmlReleve(classe,tri){
     let tot=0,max=0;
     mats.forEach((m,i)=>{const v=parseFloat(d[idx]&&d[idx][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
     const moy=max?(tot/max*10).toFixed(2):"";
-    h+="<td id='moy_"+idx+"' style='font-weight:800;text-align:center'>"+moy+"</td><td id='rang_"+idx+"' style='text-align:center'></td><td id='app_"+idx+"'>"+appreciation(moy)+"</td></tr>";
+    h+="<td id='tot_"+idx+"' style='font-weight:800;text-align:center'>"+(max?tot:"")+"</td><td id='moy_"+idx+"' style='font-weight:800;text-align:center'>"+moy+"</td>"<td id='moy_"+idx+"' style='font-weight:800;text-align:center'>"+moy+"</td><td id='rang_"+idx+"' style='text-align:center'></td><td id='app_"+idx+"'>"+appreciation(moy)+"</td></tr>";
   });
   h+="</table><p style='font-size:12px;color:#666'>Les notes sont enregistrées automatiquement. La moyenne est sur 10 même pour les matières sur 20.</p></div>";
   return h;
