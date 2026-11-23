@@ -172,6 +172,109 @@ function load(){try{let v=JSON.parse(localStorage.getItem(key()));if(v&&!Array.i
 function addLigne(){let k="eprepa5_"+curCls+"_"+curRub+"_extra";let n=parseInt(localStorage.getItem(k)||"0")+1;localStorage.setItem(k,n);renderContent();}
 function save(){let d={};document.querySelectorAll("#content input[data-k], #content textarea[data-k], #content select[data-k]").forEach(i=>{if(i.type=="checkbox")d[i.dataset.k]=i.checked?"1":"";else d[i.dataset.k]=i.value});localStorage.setItem(key(),JSON.stringify(d));alert("Enregistré ! ✅")}
 function setCls(c){curCls=c;renderClasses();renderRubs();renderContent()}
+function getElevesFull(classe){
+  try{
+    let d=JSON.parse(localStorage.getItem('eprepa5_'+classe+'_liste')||'{}');
+    let r=[];
+    for(let i=0;i<80;i++){
+      let nom=(d['x'+i+'c1']||'').trim();
+      if(!nom) continue;
+      r.push({orig:i,nom:nom.toUpperCase(),sexe:d['x'+i+'c2']||'',naiss:d['x'+i+'c3']||'',handicap:d['x'+i+'c8']||'-',statut:d['x'+i+'c9']||''});
+    }
+    r.sort((a,b)=>a.nom.localeCompare(b.nom));
+    return r;
+  }catch(e){return [];}
+}
+function ageAu31Dec(naiss){
+  if(!naiss) return '';
+  let y=parseInt(naiss.slice(0,4)); if(isNaN(y)) return '';
+  return new Date().getFullYear()-y;
+}
+function moyTri(classe,tri,si){
+  let d=getReleve(classe,tri); let mats=MATIERES_RELEVE[classe]||[];
+  let tot=0,max=0; mats.forEach((m,i)=>{let v=parseFloat(d[si]&&d[si][i]); if(!isNaN(v)){tot+=v;max+=m[1];}});
+  return max?(tot/max*10):null;
+}
+function getCEP(classe){ try{return JSON.parse(localStorage.getItem('cep_'+classe)||'{}');}catch(e){return {};} }
+function saveCEP(classe,idx,val){
+  let d=getCEP(classe); d[idx]=val; localStorage.setItem('cep_'+classe,JSON.stringify(d)); renderContent();
+}
+function htmlProposition(classe){
+  let eleves=getElevesFull(classe);
+  if(!eleves.length) return '<p style="padding:16px">Aucun eleve. Remplis d abord la Liste alphabetique pour '+classe+'.</p>';
+  let base={CP1:1,CP2:2,CE1:3,CE2:4,CM1:5,CM2:6}[classe]||1;
+  eleves.forEach((e,si)=>{
+    let m1=moyTri(classe,1,si),m2=moyTri(classe,2,si),m3=moyTri(classe,3,si);
+    e.m1=m1; e.m2=m2; e.m3=m3;
+    let vals=[m1,m2,m3].filter(v=>v!==null);
+    e.moyG=vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length):null;
+    e.age=ageAu31Dec(e.naiss);
+    let nbRed=0; try{ let d=JSON.parse(localStorage.getItem('eprepa5_'+classe+'_liste')||'{}'); ['CP1','CP2','CE1','CE2','CM1','CM2'].forEach(c=>{ if(d['x'+e.orig+'c5_'+c]==='1') nbRed++; }); }catch(err){}
+    e.scol=base+nbRed;
+    e.isHandi=e.handicap&&e.handicap!=='-'&&e.handicap!=='';
+    e.exclus=(e.age!==''&&e.age>16);
+    e.partant=(e.statut==='Deces'||e.statut==='Transfert Depart'||e.statut==='Abandon declare'||e.statut==='Abandon non declare');
+  });
+  let tries=[...eleves].filter(e=>e.moyG!==null).sort((a,b)=>b.moyG-a.moyG);
+  let rangMap=new Map(); let rr=1; tries.forEach((e,i)=>{ if(i>0&&e.moyG<tries[i-1].moyG) rr=i+1; rangMap.set(e,rr); });
+  eleves.forEach(e=>{e.rang=rangMap.get(e)||'';});
+  let evalues=eleves.filter(e=>e.moyG!==null&&!e.partant&&!e.exclus);
+  let nbRedoub=0; let redoubSet=new Set();
+  if(classe==='CP2'||classe==='CE2'){
+    nbRedoub=Math.ceil(evalues.length*0.10);
+    [...evalues].sort((a,b)=>a.moyG-b.moyG).slice(0,nbRedoub).forEach(e=>redoubSet.add(e));
+  }
+  let cep=getCEP(classe);
+  eleves.forEach((e,si)=>{
+    if(e.statut==='Deces') e.prop='Deces';
+    else if(e.statut==='Transfert Depart') e.prop='Transfert Depart';
+    else if(e.statut==='Abandon declare'||e.statut==='Abandon non declare') e.prop='Abandon';
+    else if(e.exclus) e.prop='Exclus';
+    else if(classe==='CM2'){
+      let c=cep[si]||'';
+      if(c==='Admis') e.prop='Admis';
+      else if(c==='Echec') e.prop='Autorise a redoubler';
+      else e.prop='En attente CEP';
+    }
+    else if(redoubSet.has(e)) e.prop='Autorise a redoubler';
+    else e.prop='Promu';
+  });
+  let f=v=> v===null||v===undefined||v===''?'':(typeof v==='number'?v.toFixed(2):v);
+  let h='<div style="padding:10px;overflow:auto"><h2 style="text-align:center">PROPOSITIONS DE FIN D ANNEE - '+classe+'</h2>';
+  h+='<p style="font-size:12px">Moyenne generale = (T1+T2+T3)/3 | CP1/CE1/CM1 : 100% promus sauf Exclus | CP2/CE2 : 10% les plus faibles redoublent ('+nbRedoub+' sur '+evalues.length+') | CM2 : selon CEP | Exclus : +16 ans au 31 dec.</p>';
+  if(classe==='CM2') h+='<p>Choisis le CEP dans la derniere colonne : Admis ou Echec.</p>';
+  h+='<div class="scroll"><table><tr><th>N°</th><th>Nom et Prenom(s)</th><th>Sexe</th><th>Handicap</th><th>Age</th><th>Scolarite</th><th>Moy T1</th><th>Moy T2</th><th>Moy T3</th><th>Moy. generale</th><th>Rang</th><th>Proposition</th>'+(classe==='CM2'?'<th>CEP</th>':'')+'</tr>';
+  eleves.forEach((e,si)=>{
+    let bg=e.prop==='Autorise a redoubler'?'background:#ffe0e0':(e.prop==='Exclus'?'background:#ddd':(e.prop==='Promu'||e.prop==='Admis'?'background:#e0ffe0':''));
+    let sel='';
+    if(classe==='CM2'){ let c=cep[si]||''; sel='<td><select onchange="saveCEP(\''+classe+'\','+si+',this.value)"><option value=""></option><option '+(c==='Admis'?'selected':'')+'>Admis</option><option '+(c==='Echec'?'selected':'')+'>Echec</option></select></td>'; }
+    h+='<tr><td>'+(si+1)+'</td><td style="text-align:left;font-weight:600">'+e.nom+'</td><td>'+e.sexe+'</td><td>'+e.handicap+'</td><td>'+e.age+'</td><td>'+e.scol+'</td><td>'+f(e.m1)+'</td><td>'+f(e.m2)+'</td><td>'+f(e.m3)+'</td><td style="font-weight:800">'+f(e.moyG)+'</td><td>'+e.rang+'</td><td style="'+bg+';font-weight:700">'+e.prop+'</td>'+sel+'</tr>';
+  });
+  h+='</table></div>';
+  let cnt=fn=>({g:eleves.filter(e=>e.sexe==='M'&&fn(e)).length,f:eleves.filter(e=>e.sexe==='F'&&fn(e)).length,t:eleves.filter(fn).length});
+  let cntH=fn=>({g:eleves.filter(e=>e.sexe==='M'&&e.isHandi&&fn(e)).length,f:eleves.filter(e=>e.sexe==='F'&&e.isHandi&&fn(e)).length,t:eleves.filter(e=>e.isHandi&&fn(e)).length});
+  let debut=cnt(()=>true),debutH=cntH(()=>true);
+  let deces=cnt(e=>e.statut==='Deces'),decesH=cntH(e=>e.statut==='Deces');
+  let arr=cnt(e=>e.statut==='Transfert Arrivee'),arrH=cntH(e=>e.statut==='Transfert Arrivee');
+  let dep=cnt(e=>e.statut==='Transfert Depart'),depH=cntH(e=>e.statut==='Transfert Depart');
+  let abd=cnt(e=>e.statut==='Abandon declare'),abdH=cntH(e=>e.statut==='Abandon declare');
+  let abnd=cnt(e=>e.statut==='Abandon non declare'),abndH=cntH(e=>e.statut==='Abandon non declare');
+  let fin={g:debut.g-deces.g-dep.g-abd.g-abnd.g,f:debut.f-deces.f-dep.f-abd.f-abnd.f,t:debut.t-deces.t-dep.t-abd.t-abnd.t};
+  let finH={g:debutH.g-decesH.g-depH.g-abdH.g-abndH.g,f:debutH.f-decesH.f-depH.f-abdH.f-abndH.f,t:debutH.t-decesH.t-depH.t-abdH.t-abndH.t};
+  let promus=cnt(e=>e.prop==='Promu'||e.prop==='Admis'),promusH=cntH(e=>e.prop==='Promu'||e.prop==='Admis');
+  let redoub=cnt(e=>e.prop==='Autorise a redoubler'),redoubH=cntH(e=>e.prop==='Autorise a redoubler');
+  let excl=cnt(e=>e.prop==='Exclus'),exclH=cntH(e=>e.prop==='Exclus');
+  let row=(lab,a,b)=>'<tr><td style="text-align:left">'+lab+'</td><td>'+a.g+'</td><td>'+a.f+'</td><td><b>'+a.t+'</b></td><td>'+b.g+'</td><td>'+b.f+'</td><td><b>'+b.t+'</b></td></tr>';
+  h+='<h3>TABLEAU RECAPITULATIF</h3><table class="recap"><tr><th></th><th colspan="3">Tous les eleves</th><th colspan="3">Handicapes uniquement</th></tr><tr><th></th><th>Garcons</th><th>Filles</th><th>Total</th><th>Garcons</th><th>Filles</th><th>Total</th></tr>';
+  h+=row('Effectif debut annee',debut,debutH)+row('Deces',deces,decesH)+row('Transferts - Arrivees',arr,arrH)+row('Transferts - Departs',dep,depH)+row('Abandons declares',abd,abdH)+row('Abandons non declares',abnd,abndH)+row('Effectif fin annee',fin,finH)+row('Promus / Admis',promus,promusH)+row('Autorises a redoubler',redoub,redoubH)+row('Exclus',excl,exclH);
+  h+='</table><p style="font-size:12px">Effectif fin = Debut - Deces - Departs - Abandons.</p>';
+  if(classe==='CM2'){
+    let taux=fin.t?((promus.t/fin.t*100).toFixed(1)+'%'):'';
+    h+='<h3>Resultats CEP</h3><table><tr><th></th><th>Garcons</th><th>Filles</th><th>Total</th></tr><tr><td style="text-align:left">Inscrits</td><td>'+fin.g+'</td><td>'+fin.f+'</td><td>'+fin.t+'</td></tr><tr><td style="text-align:left">Admis</td><td>'+promus.g+'</td><td>'+promus.f+'</td><td>'+promus.t+'</td></tr><tr><td style="text-align:left">Echecs</td><td>'+redoub.g+'</td><td>'+redoub.f+'</td><td>'+redoub.t+'</td></tr><tr><td style="text-align:left">Taux de succes</td><td colspan="3">'+taux+'</td></tr></table>';
+  }
+  h+='<div class="no-print" style="margin:12px 0"><button class="btn print" onclick="window.print()">Imprimer Proposition</button></div></div>';
+  return h;
+}
 function renderClasses(){document.getElementById("classes").innerHTML=classes.map(c=>`<button class="btn cls ${c==curCls?"active":""}" onclick="setCls('${c}')">${c}</button>`).join("")}
 function renderRubs(){document.getElementById("rubriques").innerHTML=`<h3>${curCls} - Choisis une rubrique :</h3>`+rubs.map(r=>`<button class="btn rub" onclick="setRub('${r.id}')">${r.t}</button>`).join("")}
 function setRub(id){curRub=id;renderContent()}
