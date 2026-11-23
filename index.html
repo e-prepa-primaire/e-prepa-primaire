@@ -367,7 +367,7 @@ rows+=`<tr>${cells}</tr>`;
 }
 let titre=rubs.find(r=>r.id==curRub).t;
 let legende = curRub=="liste" ? `<div class="note" style="font-size:12px;text-align:left"><b>Légende Handicap :</b> - = Aucun &nbsp; | &nbsp; <b>DA</b> = Déficience Auditive &nbsp; | &nbsp; <b>DV</b> = Déficience Visuelle &nbsp; | &nbsp; <b>DI</b> = Déficience Intellectuelle &nbsp; | &nbsp; <b>DM</b> = Déficience Motrice &nbsp; | &nbsp; <b>TL</b> = Trouble du Langage &nbsp; | &nbsp; <b>A</b> = Albinisme &nbsp; | &nbsp; <b>P</b> = Polyhandicap</div>` : "";
-document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn" onclick="addLigne()">+ Ajouter une ligne</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table><div id="recapListe"></div>`;
+document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b></div>${legende}<div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn" onclick="addLigne()">+ Ajouter une ligne</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table><div id="recapListe"></div>`;
 if(curRub=="liste")majRecap();
 }
 function majRecap(){
