@@ -357,7 +357,7 @@ let anaRows="";
 for(let i=0;i<3;i++){
 anaRows+=`<tr><td>${ta("plan_prob"+i,2,"")}</td><td>${ta("plan_manif"+i,2,"")}</td><td>${ta("plan_cause"+i,2,"")}</td></tr>`;
 }
-document.getElementById("content").innerHTML=`
+document.getElementById("content").innerHTML=`<div class="plan-page">
 <div class="note"><b>${curCls} - 5. Plan d'amélioration</b><br>OUTIL D'APPUI / CONSEIL A L'ENCADREMENT PEDAGOGIQUE</div>
 <div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div>
 
