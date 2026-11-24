@@ -345,6 +345,69 @@ recapRows+=`<tr>${cells}</tr>`;
 let num=curCls=="CP1"?"1re":curCls=="CP2"?"2e":curCls;
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${e.titre}</b><br>ANNÉE SCOLAIRE : <input style="width:120px;display:inline-block" value=""></div><div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn" onclick="addLigne()">+ Ajouter une ligne</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><div class="scroll emploi"><table><thead>${head}</thead><tbody>${rows}</tbody></table></div><div class="recap-page"><h3>Tableau récapitulatif ${num}</h3><div class="scroll"><table class="recap"><thead>${recapHead}</thead><tbody>${recapRows}</tbody></table></div><p style="font-size:12px">Le/la Titulaire de la classe &nbsp;&nbsp; Le/la Directeur/trice de l’école &nbsp;&nbsp; Visa du Chef de Circonscription</p><p style="font-size:10px">N.B : Les écoles qui disposent de matériel informatique pourraient consacrer le temps réservé aux Travaux Pratiques d’Observation (30mn le vendredi soir) pour les TIC</p></div>`;return;}
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - 2. Emploi du temps</b><br>En attente de ton fichier pour ${curCls}.</div>`;return;}
+if(curRub=="plan"){
+let P=(k)=>data[k]||"";
+let inp=(k,ph="")=>`<input data-k="${k}" value="${esc(P(k))}" placeholder="${ph}">`;
+let ta=(k,rows=2,ph="")=>`<textarea data-k="${k}" rows="${rows}" placeholder="${ph}">${P(k)}</textarea>`;
+let discRows="";
+for(let i=0;i<10;i++){
+discRows+=`<tr><td>${ta("plan_disc"+i,1,"Discipline")}</td><td>${inp("plan_taux"+i,"%")}</td></tr>`;
+}
+let anaRows="";
+for(let i=0;i<3;i++){
+anaRows+=`<tr><td>${ta("plan_prob"+i,2,"")}</td><td>${ta("plan_manif"+i,2,"")}</td><td>${ta("plan_cause"+i,2,"")}</td></tr>`;
+}
+document.getElementById("content").innerHTML=`
+<div class="note"><b>${curCls} - 5. Plan d'amélioration</b><br>OUTIL D'APPUI / CONSEIL A L'ENCADREMENT PEDAGOGIQUE</div>
+<div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div>
+
+<h3>I. IDENTIFICATION</h3>
+<table>
+<tr><td style="text-align:left">Circonscription d'Education de Base de :</td><td>${inp("plan_ceb")}</td></tr>
+<tr><td style="text-align:left">Ecole :</td><td>${inp("plan_ecole")}</td></tr>
+<tr><td style="text-align:left">Publique / Privée classique :</td><td>${inp("plan_type","Publique / Privée")}</td></tr>
+<tr><td style="text-align:left">Classe innovée : oui / non - Si oui précisez :</td><td>${inp("plan_innovee")}</td></tr>
+<tr><td style="text-align:left">Classe : ${curCls} - Effectif :</td><td>${inp("plan_effectif")}</td></tr>
+<tr><td style="text-align:left">Filles :</td><td>${inp("plan_f")}</td></tr>
+<tr><td style="text-align:left">Garçons :</td><td>${inp("plan_g")}</td></tr>
+<tr><td style="text-align:left">Enseignant E1 - Nom et prénoms / Emploi / Sexe :</td><td>${inp("plan_e1")}</td></tr>
+<tr><td style="text-align:left">Enseignant E2 - Nom et prénoms / Emploi / Sexe :</td><td>${inp("plan_e2")}</td></tr>
+</table>
+
+<h3>II. DEMARCHE - II.1. CUEILLETTE D'INFORMATIONS</h3>
+<h3>II.1.1. RESULTATS DES ELEVES DANS LES DIFFERENTES DISCIPLINES</h3>
+<table><tr><th>Disciplines</th><th>Taux de réussite des élèves par discipline</th></tr>${discRows}</table>
+
+<h3>II.1.2. PRINCIPALES DIFFICULTES RENCONTREES PAR LE MAITRE</h3>
+${ta("plan_diff",4,"Difficultés liées à la pratique classe...")}
+
+<h3>II.2. ANALYSE DES RESULTATS SCOLAIRES</h3>
+<h3>II.2.1. DISCIPLINES A FAIBLE TAUX (3 au plus)</h3>
+1) ${inp("plan_faible1")}<br>2) ${inp("plan_faible2")}<br>3) ${inp("plan_faible3")}
+
+<h3>II.2.2. DISCIPLINE-PROBLEME A AMELIORER</h3>
+${ta("plan_choix",2,"Discipline choisie...")}
+
+<h3>II.2.3. ANALYSE DE LA DISCIPLINE-PROBLEME</h3>
+<table><tr><th>PROBLEME</th><th>MANIFESTATIONS / CONSTATS</th><th>CAUSES</th></tr>${anaRows}</table>
+<p style="text-align:left">Les élèves sont faibles en : ${inp("plan_faibles_en")}</p>
+
+<h3>III. PLAN D'AMELIORATION</h3>
+<p style="text-align:left">Objectif général : Améliorer les résultats des élèves en ${inp("plan_obj_disc","discipline")} de ${inp("plan_obj_de","...%")} à ${inp("plan_obj_a","...%")}</p>
+<table><thead><tr><th>Objectifs Intermédiaires</th><th>Activités pédagogiques du Maître</th><th>Calendrier d'exécution</th><th>Indicateurs de Progrès</th><th>Méthodes de Collecte des données</th></tr></thead><tbody>
+${[0,1,2,3].map(i=>`<tr><td>${ta("x"+i+"c0",2,"O.I. "+(i+1))}</td><td>${ta("x"+i+"c1",2,"")}</td><td>${ta("x"+i+"c2",2,"")}</td><td>${ta("x"+i+"c3",2,"")}</td><td>${ta("x"+i+"c4",2,"")}</td></tr>`).join("")}
+</tbody></table>
+<p style="font-size:11px;text-align:left">NB : au moins 2 objectifs intermédiaires. Objectifs en lien avec les manifestations. Activités en lien avec les objectifs.</p>
+
+<h3>IV. APPUI / CONSEIL</h3>
+<table><tr><th>PERSONNES DE RESSOURCES</th><th>NATURE DE L'APPUI / CONSEIL</th><th>PERIODE SOUHAITEE</th></tr>
+${[0,1,2].map(i=>`<tr><td>${ta("plan_res"+i,1,"")}</td><td>${ta("plan_nat"+i,1,"")}</td><td>${ta("plan_per"+i,1,"")}</td></tr>`).join("")}
+</table>
+<p style="text-align:left">Date : ${inp("plan_date")}</p>
+<p style="text-align:left">Signature de l'enseignant : _______________ &nbsp;&nbsp; Signature du Directeur : _______________ &nbsp;&nbsp; Visa de l'Encadreur : _______________</p>
+`;
+return;
+}
 let extra=parseInt(localStorage.getItem("eprepa5_"+curCls+"_"+curRub+"_extra")||"0");
 let cfg={cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom et prénom","Sexe","Date de naissance","Lieu de naissance","Classe redoublée","Profession des parents","Religion","Type handicap","Statut fin annee"],rows:60+extra},plan:{cols:["Objectifs Intermédiaires","Activités pédagogiques du Maître","Calendrier d'exécution","Indicateurs de Progrès","Méthodes de Collecte des données"],rows:4}}[curRub];
 let head=cfg.cols.map((c,ci)=>`<th style="${curRub=="liste"&&ci==0?"width:38px":""}">${c}</th>`).join("");
