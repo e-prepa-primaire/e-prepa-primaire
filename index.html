@@ -557,41 +557,31 @@ function onDateCahier(dateStr){
   }).join("");
 }
 
-function choisirLeconJour(horaire, texte){
-  // texte = ex "Français - Lecture" ou "Mathématiques - Calcul"
-  let parts = texte.split(/[-–:]/);
-  let discipline = (parts[0]||"").trim();
-  let matiere = (parts[1]||"").trim();
-
-  // 1. Remplit Discipline
+function choisirLeconJour(horaire, texte, duree){
+  let t = texte.toLowerCase();
+  let discipline = "";
+  if(t.includes("math")||t.includes("arith")||t.includes("géométr")||t.includes("système métrique")||t.includes("calcul")) discipline="Mathématiques";
+  else if(t.includes("a.p.e")||t.includes("ape")) discipline="APE";
+  else if(t.includes("e.c.p")||t.includes("ecp")||t.includes("citoyen")) discipline="ECP";
+  else if(t.includes("chant")||t.includes("poésie")||t.includes("récitation")) discipline="Chant / Poésie";
+  else if(t.includes("eps")||t.includes("sport")) discipline="EPS";
+  else discipline="Français";
   let sel = document.querySelector('#content select[data-k="c_discipline"]');
-  if(sel){ sel.value = discipline; sel.dispatchEvent(new Event('change')); changeDisciplineCahier(discipline); }
-
-  // 2. Remplit Matière
+  if(sel){ sel.value = discipline; changeDisciplineCahier(discipline); }
   let mat = document.querySelector('#content input[data-k="c_matiere"]');
-  if(mat) mat.value = matiere;
-
-  // 3. Calcule la durée depuis l'horaire, ex 07:30-08:15 = 45 min
-  if(horaire && horaire.includes("-")){
-    let [h1,h2] = horaire.split("-").map(s=>s.trim().replace("h",":"));
-    let toMin = (h)=>{ let p=h.split(":"); return parseInt(p[0])*60 + parseInt(p[1]||0); };
-    let dureeTotale = toMin(h2) - toMin(h1);
-    if(dureeTotale>0 && dureeTotale<180){
-      // On met toute la durée sur la plus grande étape (Analyse) et le total se recalcule
-      let durees = document.querySelectorAll('.duree-cahier');
-      if(durees.length>=4){
-        // On remet les petites étapes à leurs valeurs normales, et le reste sur Analyse
-        let base = [3,2,5,0,5,4,1];
-        base[3] = dureeTotale - (3+2+5+5+4+1);
-        if(base[3]<5) base[3]=5;
-        durees.forEach((inp,i)=>{ inp.value = base[i]; });
-        calcTotalCahier();
-      }
+  if(mat) mat.value = texte;
+  let d = parseInt((duree||"").replace(/[^0-9]/g,"")||"0");
+  if(d>0){
+    let durees = document.querySelectorAll('.duree-cahier');
+    if(durees.length>=7){
+      let base = [3,2,5,0,5,4,1];
+      base[3] = d - (3+2+5+5+4+1);
+      if(base[3]<2) base[3]=2;
+      durees.forEach((inp,i)=>{ inp.value = base[i]; });
+      calcTotalCahier();
     }
   }
-  // On remonte en haut pour voir l'en-tête remplie
   window.scrollTo(0,0);
-  alert("Leçon choisie : "+texte+" ("+horaire+")");
 }
 function majRecap(){
 let seuil={CP1:7,CP2:8,CE1:9,CE2:10,CM1:11,CM2:12}[curCls]||7;
