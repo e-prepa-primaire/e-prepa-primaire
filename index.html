@@ -519,6 +519,93 @@ function setDebutCahier(v){
   let l=document.getElementById('label-debut'); if(l) l.textContent=v;
   let h=document.getElementById('hidden-debut'); if(h) h.value=v;
 }
+function getJourFrancais(dateStr){
+  if(!dateStr) return "";
+  let d = new Date(dateStr+"T12:00:00");
+  let jours = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+  return jours[d.getDay()];
+}
+
+function onDateCahier(dateStr){
+  let jour = getJourFrancais(dateStr);
+  let titre = document.getElementById('titre-jour-cahier');
+  let box = document.getElementById('lecons-jour-cahier');
+  if(!titre || !box) return;
+  if(!jour){ titre.textContent="Choisis une date"; box.innerHTML=""; return; }
+  titre.textContent = "Leçons du "+jour+" - "+dateStr+" (dans l'ordre de l'emploi du temps) :";
+
+  // On lit l'emploi du temps déjà rempli dans la rubrique 2
+  // On cherche toutes les clés qui contiennent "emploi" + le jour
+  let lecons = [];
+  // Cas 1 : emploi stocké par jour : ex data["emploi_Lundi_0"] = "Français - Lecture | 07:30-08:15"
+  Object.keys(data).forEach(k=>{
+    if(k.toLowerCase().includes("emploi") && k.toLowerCase().includes(jour.toLowerCase())){
+      let v = data[k];
+      if(v) lecons.push({key:k, txt:v});
+    }
+  });
+
+  // Cas 2 : si ton emploi est en tableau, on le lit aussi
+  // Si rien trouvé, on affiche un message pour remplir l'emploi
+  if(lecons.length===0){
+    box.innerHTML = `<div style="font-size:13px;margin-top:6px">Aucune leçon trouvée pour ${jour}. Vérifie que ton <b>Emploi du temps (rubrique 2)</b> est bien rempli pour ${jour}.</div>`;
+    return;
+  }
+
+  // Tri chronologique : on trie par l'heure au début du texte si elle existe (07:30...)
+  lecons.sort((a,b)=>{
+    let ha = (a.txt.match(/\d{1,2}[:h]\d{2}/)||["00:00"])[0];
+    let hb = (b.txt.match(/\d{1,2}[:h]\d{2}/)||["00:00"])[0];
+    return ha.localeCompare(hb);
+  });
+
+  box.innerHTML = lecons.map((l,i)=>{
+    // On essaie de séparer Horaire - Discipline - Matière
+    let horaire = (l.txt.match(/\d{1,2}[:h]\d{2}\s*[-–]\s*\d{1,2}[:h]\d{2}/)||[""])[0];
+    let reste = l.txt.replace(horaire,"").replace(/^[-–|: ]+/,"").trim();
+    return `<button onclick="choisirLeconJour('${horaire.replace(/'/g,"")}','${reste.replace(/'/g,"").replace(/\n/g," ")}')" style="display:block;width:100%;text-align:left;margin:4px 0;padding:8px;background:#fff;border:1px solid #1a73e8;border-radius:8px">
+      <b>${i+1}. ${horaire || "Heure ?"}</b> - ${reste || l.txt}
+      <span style="float:right;color:#1a73e8">Choisir ➜</span>
+    </button>`;
+  }).join("");
+}
+
+function choisirLeconJour(horaire, texte){
+  // texte = ex "Français - Lecture" ou "Mathématiques - Calcul"
+  let parts = texte.split(/[-–:]/);
+  let discipline = (parts[0]||"").trim();
+  let matiere = (parts[1]||"").trim();
+
+  // 1. Remplit Discipline
+  let sel = document.querySelector('#content select[data-k="c_discipline"]');
+  if(sel){ sel.value = discipline; sel.dispatchEvent(new Event('change')); changeDisciplineCahier(discipline); }
+
+  // 2. Remplit Matière
+  let mat = document.querySelector('#content input[data-k="c_matiere"]');
+  if(mat) mat.value = matiere;
+
+  // 3. Calcule la durée depuis l'horaire, ex 07:30-08:15 = 45 min
+  if(horaire && horaire.includes("-")){
+    let [h1,h2] = horaire.split("-").map(s=>s.trim().replace("h",":"));
+    let toMin = (h)=>{ let p=h.split(":"); return parseInt(p[0])*60 + parseInt(p[1]||0); };
+    let dureeTotale = toMin(h2) - toMin(h1);
+    if(dureeTotale>0 && dureeTotale<180){
+      // On met toute la durée sur la plus grande étape (Analyse) et le total se recalcule
+      let durees = document.querySelectorAll('.duree-cahier');
+      if(durees.length>=4){
+        // On remet les petites étapes à leurs valeurs normales, et le reste sur Analyse
+        let base = [3,2,5,0,5,4,1];
+        base[3] = dureeTotale - (3+2+5+5+4+1);
+        if(base[3]<5) base[3]=5;
+        durees.forEach((inp,i)=>{ inp.value = base[i]; });
+        calcTotalCahier();
+      }
+    }
+  }
+  // On remonte en haut pour voir l'en-tête remplie
+  window.scrollTo(0,0);
+  alert("Leçon choisie : "+texte+" ("+horaire+")");
+}
 function majRecap(){
 let seuil={CP1:7,CP2:8,CE1:9,CE2:10,CM1:11,CM2:12}[curCls]||7;
 let anneeRef=new Date().getFullYear();
