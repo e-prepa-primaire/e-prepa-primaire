@@ -420,6 +420,62 @@ ${[0,1,2].map(i=>`<tr><td>${ta("plan_res"+i,1,"")}</td><td>${ta("plan_nat"+i,1,"
 </div>`;
 return;
 }
+if(curRub=="cahier"){
+  let P=(k)=>data[k]||"";
+  let inp=(k,ph="")=>`<input data-k="${k}" value="${esc(P(k))}" placeholder="${ph}">`;
+  let ta=(k,rows=2,ph="")=>`<textarea data-k="${k}" rows="${rows}" placeholder="${ph}">${P(k)}</textarea>`;
+  let dur=(k,v)=>`<input type="number" data-k="${k}" class="duree-cahier" value="${P(k)!=""?P(k):v}" oninput="calcTotalCahier()" style="width:50px"> min`;
+
+  let steps=[
+    {phase:"PHASE DE PRÉSENTATION", label:"debut", def:"Rappel"},
+    {phase:"", label:"Motivation", def:"Motivation"},
+    {phase:"PHASE DE DÉVELOPPEMENT", label:"Présentation de la situation", def:"Présentation de la situation"},
+    {phase:"", label:"Analyse / Échanges / Production", def:"Analyse / Échanges / Production"},
+    {phase:"", label:"Synthèse / Application", def:"Synthèse / Application"},
+    {phase:"PHASE D'ÉVALUATION", label:"Évaluation des acquis", def:"Évaluation des acquis"},
+    {phase:"", label:"Prolongement / Transfert", def:"Prolongement / Transfert"},
+  ];
+  let dureesDef=[3,2,5,10,5,4,1];
+  let rowsHtml="";
+  steps.forEach((s,i)=>{
+    if(s.phase) rowsHtml+=`<tr><td colspan="4" style="background:#e8f0fe;text-align:left"><b>${s.phase}</b></td></tr>`;
+    let labelCell = i==0 ? `<b><span id="label-debut">${P("c_debut")||"Rappel"}</span></b><br>${dur("c_dur"+i, dureesDef[i])}` : `<b>${s.label}</b><br>${dur("c_dur"+i, dureesDef[i])}`;
+    rowsHtml+=`<tr><td>${labelCell}</td><td>${ta("c_ens"+i,2,"Rôle de l'enseignant.e")}</td><td>${ta("c_app"+i,2,"Activités des apprenant.e.s")}</td><td>${ta("c_obs"+i,1,"")}</td></tr>`;
+  });
+
+  let isMaths = P("c_discipline")==="Mathématiques";
+  document.getElementById("content").innerHTML=`
+  <div class="note"><b>${curCls} - 3. Cahier de préparation - Canevas unique</b></div>
+  <div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div>
+
+  <h3>EN-TÊTE</h3>
+  <table>
+    <tr><td style="text-align:left">Classe : ${curCls} - Effectif :</td><td>${inp("c_effectif","G:.. F:.. Total:..")}</td></tr>
+    <tr><td style="text-align:left">Date :</td><td><input type="date" data-k="c_date" value="${P("c_date")}"></td></tr>
+    <tr><td style="text-align:left">Discipline :</td><td><select data-k="c_discipline" onchange="changeDisciplineCahier(this.value)"><option value="">-- Choisir --</option>${["Français","Mathématiques","ECP","APE","EPS","Chant / Poésie"].map(o=>`<option ${P("c_discipline")==o?"selected":""}>${o}</option>`).join("")}</select></td></tr>
+    <tr><td style="text-align:left">Matière :</td><td>${inp("c_matiere","Lecture / Calcul...")}</td></tr>
+    <tr><td style="text-align:left">Thème :</td><td>${inp("c_theme","...")}</td></tr>
+    <tr><td style="text-align:left">Titre :</td><td>${inp("c_titre","Titre de la leçon")}</td></tr>
+    <tr><td style="text-align:left">Objectifs :</td><td>${ta("c_objectifs",2,"À l'issue de la séance, l'apprenant.e doit être capable de...")}</td></tr>
+    <tr><td style="text-align:left">Matériel :</td><td>${inp("c_materiel","Collectif / Individuel")}</td></tr>
+    <tr><td style="text-align:left">Document :</td><td>${inp("c_doc","Manuel page...")}</td></tr>
+    <tr><td style="text-align:left"><b>Durée totale : <span id="total-cahier">30</span> min</b></td><td style="font-size:12px">Les durées sont modifiables</td></tr>
+  </table>
+
+  <div id="box-maths-cahier" style="display:${isMaths?"block":"none"};background:#fff3cd;padding:8px;border-radius:8px;margin:10px 0">
+    <b>1ère étape Maths :</b>
+    <label><input type="radio" name="debutCahier" value="Calcul rapide" ${(P("c_debut")||"Rappel")==="Calcul rapide"?"checked":""} onchange="setDebutCahier(this.value)"> Calcul rapide</label>
+    <label><input type="radio" name="debutCahier" value="Calcul mental" ${P("c_debut")==="Calcul mental"?"checked":""} onchange="setDebutCahier(this.value)"> Calcul mental</label>
+    <label><input type="radio" name="debutCahier" value="Rappel" ${(P("c_debut")||"Rappel")==="Rappel"?"checked":""} onchange="setDebutCahier(this.value)"> Rappel</label>
+    <input type="hidden" data-k="c_debut" id="hidden-debut" value="${P("c_debut")||"Rappel"}">
+  </div>
+
+  <h3>DÉROULEMENT</h3>
+  <table><tr><th>Étapes / Durée</th><th>Rôle de l'enseignant.e</th><th>Activités des apprenant.e.s</th><th>Obs.</th></tr>${rowsHtml}</table>
+  `;
+  calcTotalCahier();
+  return;
+}
 let extra=parseInt(localStorage.getItem("eprepa5_"+curCls+"_"+curRub+"_extra")||"0");
 let cfg={cahier:{cols:["Date","Matière","Objectif","Ce que je vais faire"],rows:5},liste:{cols:["N°","Nom et prénom","Sexe","Date de naissance","Lieu de naissance","Classe redoublée","Profession des parents","Religion","Type handicap","Statut fin annee"],rows:60+extra},plan:{cols:["Objectifs Intermédiaires","Activités pédagogiques du Maître","Calendrier d'exécution","Indicateurs de Progrès","Méthodes de Collecte des données"],rows:4}}[curRub];
 let head=cfg.cols.map((c,ci)=>`<th style="${curRub=="liste"&&ci==0?"width:38px":""}">${c}</th>`).join("");
