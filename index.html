@@ -610,7 +610,6 @@ function onDateCahier(dateStr){
     } else {
       fusion.push({...l});
     }
-  });
   lignes = fusion;
   if(!lignes.length){ box.innerHTML = `<div>Aucune leçon pour ${jour}.</div>`; return; }
   box.innerHTML = lignes.map((l,i)=>{
