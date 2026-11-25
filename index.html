@@ -451,7 +451,7 @@ if(curRub=="cahier"){
   <h3>EN-TÊTE</h3>
   <table>
     <tr><td style="text-align:left">Classe : ${curCls} - Effectif :</td><td>${inp("c_effectif","G:.. F:.. Total:..")}</td></tr>
-    <tr><td style="text-align:left">Date :</td><td><input type="date" data-k="c_date" value="${P("c_date")}"></td></tr>
+    <tr><td style="text-align:left">Date :</td><td><input type="date" data-k="c_date" value="${P("c_date")}" onchange="onDateCahier(this.value)"></td></tr>
     <tr><td style="text-align:left">Discipline :</td><td><select data-k="c_discipline" onchange="changeDisciplineCahier(this.value)"><option value="">-- Choisir --</option>${["Français","Mathématiques","ECP","APE","EPS","Chant / Poésie"].map(o=>`<option ${P("c_discipline")==o?"selected":""}>${o}</option>`).join("")}</select></td></tr>
     <tr><td style="text-align:left">Matière :</td><td>${inp("c_matiere","Lecture / Calcul...")}</td></tr>
     <tr><td style="text-align:left">Thème :</td><td>${inp("c_theme","...")}</td></tr>
