@@ -532,41 +532,28 @@ function onDateCahier(dateStr){
   let box = document.getElementById('lecons-jour-cahier');
   if(!titre || !box) return;
   if(!jour){ titre.textContent="Choisis une date"; box.innerHTML=""; return; }
-  titre.textContent = "Leçons du "+jour+" - "+dateStr+" (dans l'ordre de l'emploi du temps) :";
-
-  // On lit l'emploi du temps déjà rempli dans la rubrique 2
-  // On cherche toutes les clés qui contiennent "emploi" + le jour
-  let lecons = [];
-  // Cas 1 : emploi stocké par jour : ex data["emploi_Lundi_0"] = "Français - Lecture | 07:30-08:15"
-  Object.keys(data).forEach(k=>{
-    if(k.toLowerCase().includes("emploi") && k.toLowerCase().includes(jour.toLowerCase())){
-      let v = data[k];
-      if(v) lecons.push({key:k, txt:v});
-    }
+  titre.textContent = "Leçons du "+jour+" - "+dateStr+" :";
+  let col = {"LUNDI":2,"MARDI":3,"MERCREDI":4,"JEUDI":5,"VENDREDI":6,"SAMEDI":6}[jour.toUpperCase()];
+  if(col===undefined){ box.innerHTML="Pas de cours ce jour-là."; return; }
+  let emp = (typeof emplois!=="undefined" && emplois[curCls]) ? emplois[curCls].main : [];
+  if(!emp.length){ box.innerHTML="Emploi introuvable pour "+curCls; return; }
+  let modifs = {};
+  try{ modifs = JSON.parse(localStorage.getItem("eprepa5_"+curCls+"_emploi")||"{}"); }catch(e){ modifs={}; }
+  let lignes = [];
+  emp.forEach((r, ri)=>{
+    let horaire = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
+    let duree = modifs["m"+ri+"c1"]!==undefined ? modifs["m"+ri+"c1"] : r[1];
+    let matiere = modifs["m"+ri+"c"+(col-2)]!==undefined ? modifs["m"+ri+"c"+(col-2)] : r[col];
+    if(!matiere || matiere==="") matiere = modifs["m"+ri+"c2"]!==undefined ? modifs["m"+ri+"c2"] : r[2];
+    if(!matiere) return;
+    matiere = matiere.toString().trim();
+    if(matiere==="" || matiere.toUpperCase()==="RAS") return;
+    if(matiere.toUpperCase().includes("RECRE") || matiere.toUpperCase().includes("INTER-")) return;
+    lignes.push({horaire: horaire.toString(), duree: duree.toString(), matiere: matiere});
   });
-
-  // Cas 2 : si ton emploi est en tableau, on le lit aussi
-  // Si rien trouvé, on affiche un message pour remplir l'emploi
-  if(lecons.length===0){
-    box.innerHTML = `<div style="font-size:13px;margin-top:6px">Aucune leçon trouvée pour ${jour}. Vérifie que ton <b>Emploi du temps (rubrique 2)</b> est bien rempli pour ${jour}.</div>`;
-    return;
-  }
-
-  // Tri chronologique : on trie par l'heure au début du texte si elle existe (07:30...)
-  lecons.sort((a,b)=>{
-    let ha = (a.txt.match(/\d{1,2}[:h]\d{2}/)||["00:00"])[0];
-    let hb = (b.txt.match(/\d{1,2}[:h]\d{2}/)||["00:00"])[0];
-    return ha.localeCompare(hb);
-  });
-
-  box.innerHTML = lecons.map((l,i)=>{
-    // On essaie de séparer Horaire - Discipline - Matière
-    let horaire = (l.txt.match(/\d{1,2}[:h]\d{2}\s*[-–]\s*\d{1,2}[:h]\d{2}/)||[""])[0];
-    let reste = l.txt.replace(horaire,"").replace(/^[-–|: ]+/,"").trim();
-    return `<button onclick="choisirLeconJour('${horaire.replace(/'/g,"")}','${reste.replace(/'/g,"").replace(/\n/g," ")}')" style="display:block;width:100%;text-align:left;margin:4px 0;padding:8px;background:#fff;border:1px solid #1a73e8;border-radius:8px">
-      <b>${i+1}. ${horaire || "Heure ?"}</b> - ${reste || l.txt}
-      <span style="float:right;color:#1a73e8">Choisir ➜</span>
-    </button>`;
+  if(!lignes.length){ box.innerHTML = `<div>Aucune leçon pour ${jour}.</div>`; return; }
+  box.innerHTML = lignes.map((l,i)=>{
+    return `<button onclick="choisirLeconJour('${l.horaire.replace(/'/g,"")}','${l.matiere.replace(/'/g,"").replace(/\n/g," ")}','${l.duree.replace(/'/g,"")}')" style="display:block;width:100%;text-align:left;margin:4px 0;padding:8px;background:#fff;border:1px solid #1a73e8;border-radius:8px"><b>${i+1}. ${l.horaire} (${l.duree})</b> - ${l.matiere}<span style="float:right;color:#1a73e8">Choisir ➜</span></button>`;
   }).join("");
 }
 
