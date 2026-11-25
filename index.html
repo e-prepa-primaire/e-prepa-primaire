@@ -501,6 +501,20 @@ let legende = curRub=="liste" ? `<div class="note" style="font-size:12px;text-al
 document.getElementById("content").innerHTML=`<div class="note"><b>${curCls} - ${titre}</b></div>${legende}<div class="top no-print"><button class="btn save" onclick="save()">💾 Enregistrer</button><button class="btn" onclick="addLigne()">+ Ajouter une ligne</button><button class="btn print" onclick="window.print()">🖨️ Imprimer</button></div><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table><div id="recapListe"></div>`;
 if(curRub=="liste")majRecap();
 }
+function calcTotalCahier(){
+  let total=0;
+  document.querySelectorAll('.duree-cahier').forEach(i=>{ total += Number(i.value||0); });
+  let el=document.getElementById('total-cahier'); if(el) el.textContent=total;
+}
+function changeDisciplineCahier(v){
+  let box=document.getElementById('box-maths-cahier');
+  if(box) box.style.display = (v==='Mathématiques') ? 'block' : 'none';
+  if(v!=='Mathématiques'){ setDebutCahier('Rappel'); }
+}
+function setDebutCahier(v){
+  let l=document.getElementById('label-debut'); if(l) l.textContent=v;
+  let h=document.getElementById('hidden-debut'); if(h) h.value=v;
+}
 function majRecap(){
 let seuil={CP1:7,CP2:8,CE1:9,CE2:10,CM1:11,CM2:12}[curCls]||7;
 let anneeRef=new Date().getFullYear();
