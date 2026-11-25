@@ -540,12 +540,19 @@ function onDateCahier(dateStr){
   let modifs = {};
   try{ modifs = JSON.parse(localStorage.getItem("eprepa5_"+curCls+"_emploi")||"{}"); }catch(e){ modifs={}; }
   let lignes = [];
+  let derniereMatiere = "";
   emp.forEach((r, ri)=>{
     let horaire = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
     let duree = modifs["m"+ri+"c1"]!==undefined ? modifs["m"+ri+"c1"] : r[1];
     let matiere = modifs["m"+ri+"c"+(col-2)]!==undefined ? modifs["m"+ri+"c"+(col-2)] : r[col];
-    if(!matiere || matiere==="") matiere = modifs["m"+ri+"c2"]!==undefined ? modifs["m"+ri+"c2"] : r[2];
-    if(!matiere) return;
+    matiere = (matiere||"").toString().trim();
+    // CELLULE FUSIONNÉE : case vide = on continue la matière d'avant
+    if(matiere===""){
+      matiere = derniereMatiere;
+    } else {
+      derniereMatiere = matiere;
+    }
+  if(!matiere) return;
     matiere = matiere.toString().trim();
     if(matiere==="" || matiere.toUpperCase()==="RAS") return;
     if(matiere.toUpperCase().includes("RECRE") || matiere.toUpperCase().includes("INTER-")) return;
