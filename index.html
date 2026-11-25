@@ -558,6 +558,37 @@ function onDateCahier(dateStr){
     if(matiere.toUpperCase().includes("RECRE") || matiere.toUpperCase().includes("INTER-")) return;
     lignes.push({horaire: horaire.toString(), duree: duree.toString(), matiere: matiere});
   });
+    // Si durée vide, on la calcule depuis l'horaire
+  lignes.forEach(l=>{
+    let d = parseInt((l.duree||"").replace(/[^0-9]/g,"")||"0");
+    if(!d && l.horaire.includes("-")){
+      let p = l.horaire.split("-");
+      let aH = (p)=>{
+        let m = p.trim().match(/(\d+)h(\d*)/);
+        if(!m) return 0;
+        return parseInt(m[1])*60 + (parseInt(m[2]||"0")||0);
+      };
+      let diff = aH(p[1]) - aH(p[0]);
+      if(diff>0) l.duree = diff+" min";
+    }
+  });
+  // FUSION
+  let fusion = [];
+  lignes.forEach(l=>{
+    let nom = l.matiere.toLowerCase().replace(/\s+/g," ").trim();
+    let dernier = fusion[fusion.length-1];
+    if(dernier && dernier.matiere.toLowerCase().replace(/\s+/g," ").trim()===nom){
+      let debut = dernier.horaire.split("-")[0].trim();
+      let fin = l.horaire.split("-")[1] ? l.horaire.split("-")[1].trim() : l.horaire;
+      dernier.horaire = debut+" - "+fin;
+      let d1 = parseInt((dernier.duree||"").replace(/[^0-9]/g,"")||"0");
+      let d2 = parseInt((l.duree||"").replace(/[^0-9]/g,"")||"0");
+      dernier.duree = (d1+d2)+" min";
+    } else {
+      fusion.push({...l});
+    }
+  });
+  lignes = fusion;
   if(!lignes.length){ box.innerHTML = `<div>Aucune leçon pour ${jour}.</div>`; return; }
   box.innerHTML = lignes.map((l,i)=>{
     return `<button onclick="choisirLeconJour('${l.horaire.replace(/'/g,"")}','${l.matiere.replace(/'/g,"").replace(/\n/g," ")}','${l.duree.replace(/'/g,"")}')" style="display:block;width:100%;text-align:left;margin:4px 0;padding:8px;background:#fff;border:1px solid #1a73e8;border-radius:8px"><b>${i+1}. ${l.horaire} (${l.duree})</b> - ${l.matiere}<span style="float:right;color:#1a73e8">Choisir ➜</span></button>`;
