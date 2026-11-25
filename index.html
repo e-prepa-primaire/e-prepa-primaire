@@ -568,11 +568,34 @@ function onDateCahier(dateStr){
         if(!m) return 0;
         return parseInt(m[1])*60 + (parseInt(m[2]||"0")||0);
       };
-      let diff = aH(p[1]) - aH(p[0]);
+      let diff = aH(p[p.length-1]) - aH(p[0]);
       if(diff>0) l.duree = diff+" min";
     }
   });
-  // FUSION
+  // FUSION corrigée : seulement si ça se suit sans trou
+  let fusion = [];
+  lignes.forEach(l=>{
+    let nom = l.matiere.toLowerCase().replace(/\s+/g," ").trim();
+    let dernier = fusion[fusion.length-1];
+    let parts = l.horaire.split("-").map(s=>s.trim()).filter(Boolean);
+    let debutL = parts[0]||"";
+    let finL = parts[parts.length-1]||"";
+    let debutD = "", finD = "";
+    if(dernier){
+      let pD = dernier.horaire.split("-").map(s=>s.trim()).filter(Boolean);
+      debutD = pD[0]||"";
+      finD = pD[pD.length-1]||"";
+    }
+    if(dernier && dernier.matiere.toLowerCase().replace(/\s+/g," ").trim()===nom && finD===debutL){
+      dernier.horaire = debutD+" - "+finL;
+      let d1 = parseInt((dernier.duree||"").replace(/[^0-9]/g,"")||"0");
+      let d2 = parseInt((l.duree||"").replace(/[^0-9]/g,"")||"0");
+      dernier.duree = (d1+d2)+" min";
+    } else {
+      fusion.push({...l, horaire: debutL+" - "+finL});
+    }
+  });
+  lignes = fusion;
   let fusion = [];
   lignes.forEach(l=>{
     let nom = l.matiere.toLowerCase().replace(/\s+/g," ").trim();
