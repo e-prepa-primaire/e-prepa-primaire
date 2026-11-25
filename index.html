@@ -462,7 +462,11 @@ if(curRub=="cahier"){
     <tr><td style="text-align:left"><b>Durée totale : <span id="total-cahier">30</span> min</b></td><td style="font-size:12px">Les durées sont modifiables</td></tr>
   </table>
 
-  <div id="box-maths-cahier" style="display:${isMaths?"block":"none"};background:#fff3cd;padding:8px;border-radius:8px;margin:10px 0">
+<div id="liste-jour-cahier" style="background:#e8f0fe;padding:10px;border-radius:8px;margin:10px 0">
+  <b id="titre-jour-cahier">Choisis une date pour voir les leçons du jour</b>
+  <div id="lecons-jour-cahier"></div>
+</div> 
+<div id="box-maths-cahier" style="display:${isMaths?"block":"none"};background:#fff3cd;padding:8px;border-radius:8px;margin:10px 0">
     <b>1ère étape Maths :</b>
     <label><input type="radio" name="debutCahier" value="Calcul rapide" ${(P("c_debut")||"Rappel")==="Calcul rapide"?"checked":""} onchange="setDebutCahier(this.value)"> Calcul rapide</label>
     <label><input type="radio" name="debutCahier" value="Calcul mental" ${P("c_debut")==="Calcul mental"?"checked":""} onchange="setDebutCahier(this.value)"> Calcul mental</label>
