@@ -551,6 +551,11 @@ function onDateCahier(dateStr){
     let horaire = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
     let duree = modifs["m"+ri+"c1"]!==undefined ? modifs["m"+ri+"c1"] : r[1];
     let matiere = modifs["m"+ri+"c"+(col-2)]!==undefined ? modifs["m"+ri+"c"+(col-2)] : r[col];
+        // Mercredi 11h30-12h : case vide = pas de cours, pas de continuation
+    if(jour.toUpperCase()==="MERCREDI" && horaire.includes("11h30") && (matiere||"").toString().trim()===""){
+      derniereMatiere = "";
+      return;
+    }
     matiere = (matiere||"").toString().trim();
     // CELLULE FUSIONNÉE : case vide = on continue la matière d'avant
     if(matiere===""){
