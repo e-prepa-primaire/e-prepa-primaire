@@ -533,7 +533,7 @@ function onDateCahier(dateStr){
   if(!titre || !box) return;
   if(!jour){ titre.textContent="Choisis une date"; box.innerHTML=""; return; }
   titre.textContent = "Leçons du "+jour+" - "+dateStr+" :";
-  let col = {"LUNDI":2,"MARDI":3,"MERCREDI":4,"JEUDI":5,"VENDREDI":6,"SAMEDI":6}[jour.toUpperCase()];
+  let col = {"LUNDI":2,"MARDI":3,"MERCREDI":4,"JEUDI":5,"VENDREDI":6}[jour.toUpperCase()];
   if(col===undefined){ box.innerHTML="Pas de cours ce jour-là."; return; }
   let emp = (typeof emplois!=="undefined" && emplois[curCls]) ? emplois[curCls].main : [];
   if(!emp.length){ box.innerHTML="Emploi introuvable pour "+curCls; return; }
