@@ -539,51 +539,61 @@ function onDateCahier(dateStr){
   if(!emp.length){ box.innerHTML="Emploi introuvable pour "+curCls; return; }
   let modifs = {};
   try{ modifs = JSON.parse(localStorage.getItem("eprepa5_"+curCls+"_emploi")||"{}"); }catch(e){ modifs={}; }
+
+  // NORMALISATION : "7 h 30 – 7 h 45" -> "7h30-7h45" pour TOUTES les classes
+  let normH = (h)=>{
+    return (h||"").toString()
+      .replace(/[–—−]/g,"-")
+      .replace(/\s+/g,"")
+      .replace(/h(\d)/g,"h$1")
+      .trim();
+  };
+  let parseHeure = (s)=>{
+    let m = (s||"").trim().match(/(\d+)h(\d*)/);
+    if(!m) return 0;
+    return parseInt(m[1])*60 + (parseInt(m[2]||"0")||0);
+  };
+
   let lignes = [];
   let derniereMatiere = "";
   emp.forEach((r, ri)=>{
-      // LIGNE PAUSE : Récréation / Inter-classe / RAS = on coupe tout, on ne fusionne pas
     let texteLigne = r.join(" ").toUpperCase();
     if(texteLigne.includes("RECRE") || texteLigne.includes("INTER-") || texteLigne.includes("INTERCLASSE")){
       derniereMatiere = "";
       return;
     }
-    let horaire = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
+    let horaireBrut = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
+    let horaire = normH(horaireBrut);
     let duree = modifs["m"+ri+"c1"]!==undefined ? modifs["m"+ri+"c1"] : r[1];
-    let matiere = modifs["m"+ri+"c"+(col-2)]!==undefined ? modifs["m"+ri+"c"+(col-2)] : r[col];
-        // Mercredi 11h30-12h : case vide = pas de cours, pas de continuation
+    // CORRECTION : c+col, pas c+(col-2)
+    let matiere = modifs["m"+ri+"c"+col]!==undefined ? modifs["m"+ri+"c"+col] : r[col];
+    // Mercredi 11h30 : on utilise l'horaire normalisé
     if(jour.toUpperCase()==="MERCREDI" && horaire.includes("11h30") && (matiere||"").toString().trim()===""){
       derniereMatiere = "";
       return;
     }
     matiere = (matiere||"").toString().trim();
-    // CELLULE FUSIONNÉE : case vide = on continue la matière d'avant
     if(matiere===""){
       matiere = derniereMatiere;
     } else {
       derniereMatiere = matiere;
     }
-  if(!matiere) return;
-    matiere = matiere.toString().trim();
+    if(!matiere) return;
     if(matiere==="" || matiere.toUpperCase()==="RAS") return;
     if(matiere.toUpperCase().includes("RECRE") || matiere.toUpperCase().includes("INTER-")) return;
-    lignes.push({horaire: horaire.toString(), duree: duree.toString(), matiere: matiere});
+    lignes.push({horaire: horaire, duree: duree.toString(), matiere: matiere});
   });
-    // Si durée vide, on la calcule depuis l'horaire
+
   lignes.forEach(l=>{
     let d = parseInt((l.duree||"").replace(/[^0-9]/g,"")||"0");
     if(!d && l.horaire.includes("-")){
       let p = l.horaire.split("-");
-      let aH = (p)=>{
-        let m = p.trim().match(/(\d+)h(\d*)/);
-        if(!m) return 0;
-        return parseInt(m[1])*60 + (parseInt(m[2]||"0")||0);
-      };
-      let diff = aH(p[p.length-1]) - aH(p[0]);
+      let diff = parseHeure(p[p.length-1]) - parseHeure(p[0]);
       if(diff>0) l.duree = diff+" min";
     }
   });
-  // FUSION corrigée : seulement si ça se suit sans trou
+
+  // FUSION : avec horaires normalisés, ça marche pour CP1 à CM2
   let fusion = [];
   lignes.forEach(l=>{
     let nom = l.matiere.toLowerCase().replace(/\s+/g," ").trim();
