@@ -542,6 +542,12 @@ function onDateCahier(dateStr){
   let lignes = [];
   let derniereMatiere = "";
   emp.forEach((r, ri)=>{
+      // LIGNE PAUSE : Récréation / Inter-classe / RAS = on coupe tout, on ne fusionne pas
+    let texteLigne = r.join(" ").toUpperCase();
+    if(texteLigne.includes("RECRE") || texteLigne.includes("INTER-") || texteLigne.includes("INTERCLASSE")){
+      derniereMatiere = "";
+      return;
+    }
     let horaire = modifs["m"+ri+"c0"]!==undefined ? modifs["m"+ri+"c0"] : r[0];
     let duree = modifs["m"+ri+"c1"]!==undefined ? modifs["m"+ri+"c1"] : r[1];
     let matiere = modifs["m"+ri+"c"+(col-2)]!==undefined ? modifs["m"+ri+"c"+(col-2)] : r[col];
